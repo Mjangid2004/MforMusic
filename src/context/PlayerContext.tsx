@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from "react";
-import { Song, PlayMode, Theme, PlayerState, Tab } from "@/lib/types";
+import { Song, PlayMode, Theme, Tab } from "@/lib/types";
 
 type Action =
   | { type: "SET_QUEUE"; payload: Song[] }
