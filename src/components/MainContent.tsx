@@ -281,14 +281,36 @@ export default function MainContent() {
             ) : (
               <>
                 <p className="text-sm text-gray-400">{state.queue.length} songs in queue</p>
-                {state.queue.map((song, index) => (
-                  <div key={`queue-${song.id}-${index}`} className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 w-6">{index + 1}.</span>
-                    <div className="flex-1">
-                      <SongItem song={song} allSongs={state.queue} />
+                <div className="space-y-2">
+                  {state.queue.map((song, index) => (
+                    <div 
+                      key={`queue-${song.id}-${index}`} 
+                      className={`flex items-center gap-2 p-2 rounded-lg ${index === state.currentIndex ? 'bg-indigo-500/20' : 'hover:bg-white/10'}`}
+                    >
+                      <span className="text-sm text-gray-500 w-6 flex-shrink-0">
+                        {index === state.currentIndex ? '▶️' : `${index + 1}.`}
+                      </span>
+                      <div 
+                        className="flex-1 min-w-0 cursor-pointer" 
+                        onClick={() => playSong(song, state.queue)}
+                      >
+                        <p className="font-medium text-sm truncate">{song.title}</p>
+                        <p className="text-xs text-gray-400 truncate">{song.artist}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const newQueue = state.queue.filter((_, i) => i !== index);
+                          dispatch({ type: "SET_QUEUE", payload: newQueue });
+                        }}
+                        className="p-2 text-gray-400 hover:text-red-500 flex-shrink-0"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </>
             )}
           </div>

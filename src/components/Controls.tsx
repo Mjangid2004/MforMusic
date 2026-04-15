@@ -39,63 +39,48 @@ export default function Controls() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 md:gap-4">
-      <div className="w-full px-2 md:hidden">
-        <div className="h-1 bg-white/20 rounded-full cursor-pointer">
-          <div 
-            className="h-full bg-indigo-500 rounded-full" 
-            style={{ width: state.duration > 0 ? `${(state.currentTime / state.duration) * 100}%` : '0%' }}
-          />
-        </div>
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
-          <span>{Math.floor(state.currentTime / 60)}:{String(Math.floor(state.currentTime % 60)).padStart(2, '0')}</span>
-          <span>{Math.floor(state.duration / 60)}:{String(Math.floor(state.duration % 60)).padStart(2, '0')}</span>
-        </div>
-      </div>
+    <div className="flex items-center justify-center gap-2 md:gap-4">
+      <button
+        onClick={cyclePlayMode}
+        title={getPlayModeLabel()}
+        className={`p-1 md:p-2 rounded-full transition-all duration-300 ${
+          state.playMode !== "order"
+            ? "text-indigo-400"
+            : "text-gray-400 hover:text-white"
+        }`}
+      >
+        {getPlayModeIcon()}
+      </button>
 
-      <div className="flex items-center justify-center gap-2 md:gap-4">
-        <button
-          onClick={cyclePlayMode}
-          title={getPlayModeLabel()}
-          className={`p-1 md:p-2 rounded-full transition-all duration-300 ${
-            state.playMode !== "order"
-              ? "text-indigo-400"
-              : "text-gray-400 hover:text-white"
-          }`}
-        >
-          {getPlayModeIcon()}
-        </button>
+      <button
+        onClick={prevSong}
+        disabled={!currentSong}
+        className="p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <SkipBack className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
 
-        <button
-          onClick={prevSong}
-          disabled={!currentSong}
-          className="p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <SkipBack className="w-5 h-5 md:w-6 md:h-6" />
-        </button>
+      <button
+        onClick={togglePlay}
+        disabled={!currentSong}
+        className="p-3 md:p-4 rounded-full bg-indigo-500 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
+      >
+        {state.isPlaying ? (
+          <Pause className="w-6 h-6 md:w-8 md:h-8" />
+        ) : (
+          <Play className="w-6 h-6 md:w-8 md:h-8 ml-0.5" />
+        )}
+      </button>
 
-        <button
-          onClick={togglePlay}
-          disabled={!currentSong}
-          className="p-3 md:p-4 rounded-full bg-indigo-500 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
-        >
-          {state.isPlaying ? (
-            <Pause className="w-6 h-6 md:w-8 md:h-8" />
-          ) : (
-            <Play className="w-6 h-6 md:w-8 md:h-8 ml-0.5" />
-          )}
-        </button>
+      <button
+        onClick={nextSong}
+        disabled={!currentSong}
+        className="p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <SkipForward className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
 
-        <button
-          onClick={nextSong}
-          disabled={!currentSong}
-          className="p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <SkipForward className="w-5 h-5 md:w-6 md:h-6" />
-        </button>
-
-        <div className="w-8 md:w-10" />
-      </div>
+      <div className="w-8 md:w-10" />
     </div>
   );
 }

@@ -168,35 +168,40 @@ export default function NowPlaying() {
       </div>
 
       {/* Bottom Bar - Mobile (Compact) */}
-      <div className="md:hidden fixed bottom-14 left-0 right-0 h-20 bg-neutral-900 border-t border-neutral-800 px-3 flex items-center gap-2 z-40">
-        <div className="flex items-center gap-2 w-32 cursor-pointer flex-shrink-0" onClick={() => setShowPlayer(true)}>
-          {currentSong ? (
-            <>
-              <img
-                src={currentSong.thumbnail}
-                alt={currentSong.title}
-                className="w-10 h-10 rounded object-cover cursor-pointer flex-shrink-0"
-              />
-              <div className="overflow-hidden">
-                <p className="font-medium text-xs truncate">{currentSong.title}</p>
-                <p className="text-xs text-gray-400 truncate">{currentSong.artist}</p>
-              </div>
-            </>
-          ) : (
-            <div className="text-xs text-gray-500">No song</div>
-          )}
+      <div className="md:hidden fixed bottom-14 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-40">
+        <div className="px-3 pt-2">
+          <ProgressBar />
         </div>
+        <div className="h-16 px-3 flex items-center gap-2">
+          <div className="flex items-center gap-2 w-32 cursor-pointer flex-shrink-0" onClick={() => setShowPlayer(true)}>
+            {currentSong ? (
+              <>
+                <img
+                  src={currentSong.thumbnail}
+                  alt={currentSong.title}
+                  className="w-10 h-10 rounded object-cover cursor-pointer flex-shrink-0"
+                />
+                <div className="overflow-hidden">
+                  <p className="font-medium text-xs truncate">{currentSong.title}</p>
+                  <p className="text-xs text-gray-400 truncate">{currentSong.artist}</p>
+                </div>
+              </>
+            ) : (
+              <div className="text-xs text-gray-500">No song</div>
+            )}
+          </div>
 
-        <div className="flex-1 flex justify-center">
-          <Controls />
+          <div className="flex-1 flex justify-center">
+            <Controls />
+          </div>
+
+          <button
+            onClick={() => currentSong && toggleFavorite(currentSong)}
+            className="p-2 hover:bg-white/10 rounded-full flex-shrink-0"
+          >
+            <Heart className={`w-5 h-5 ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+          </button>
         </div>
-
-        <button
-          onClick={() => currentSong && toggleFavorite(currentSong)}
-          className="p-2 hover:bg-white/10 rounded-full flex-shrink-0"
-        >
-          <Heart className={`w-5 h-5 ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-        </button>
       </div>
 
       <YouTubePlayer />
