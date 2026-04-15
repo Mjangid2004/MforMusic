@@ -162,6 +162,7 @@ interface PlayerContextType {
   toggleFavorite: (song: Song) => void;
   isFavorite: (song: Song) => boolean;
   getTopPlayed: () => Song[];
+  setCurrentTab: (tab: Tab) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | null>(null);
