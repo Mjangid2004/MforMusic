@@ -262,11 +262,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const nextSong = useCallback(() => {
     if (state.queue.length === 0) return;
     const nextIndex = (state.currentIndex + 1) % state.queue.length;
+    const nextSongToPlay = state.queue[nextIndex];
+    
+    if (!nextSongToPlay || !nextSongToPlay.videoId) return;
+    
     if (nextIndex === 0 && state.playMode !== "repeat-all") {
       dispatch({ type: "TOGGLE_PLAY" });
       return;
     }
-    playSong(state.queue[nextIndex]);
+    playSong(nextSongToPlay);
   }, [state.queue, state.currentIndex, state.playMode, playSong]);
 
   const prevSong = useCallback(() => {
