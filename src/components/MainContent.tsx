@@ -273,6 +273,25 @@ export default function MainContent() {
               ))
             )}
           </div>
+        ) : viewMode === 'queue' ? (
+          <div className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-bold">Queue</h2>
+            {state.queue.length === 0 ? (
+              <p className="text-gray-400 text-sm">Queue is empty. Add songs to play next!</p>
+            ) : (
+              <>
+                <p className="text-sm text-gray-400">{state.queue.length} songs in queue</p>
+                {state.queue.map((song, index) => (
+                  <div key={`queue-${song.id}-${index}`} className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 w-6">{index + 1}.</span>
+                    <div className="flex-1">
+                      <SongItem song={song} allSongs={state.queue} />
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
         ) : selectedGenre ? (
           <div className="space-y-4">
             <button onClick={() => setSelectedGenre(null)} className="text-sm text-gray-400 hover:text-white">
