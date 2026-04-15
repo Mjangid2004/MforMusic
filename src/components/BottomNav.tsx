@@ -1,20 +1,20 @@
 "use client";
 
-import { useAppContext, ViewMode } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { Home, Heart, Clock } from "lucide-react";
 
 export default function BottomNav() {
   const { viewMode, setViewMode } = useAppContext();
 
-  const tabs: { id: ViewMode; label: string; icon: React.ReactNode }[] = [
-    { id: "home", label: "Home", icon: <Home className="w-6 h-6" /> },
-    { id: "liked", label: "Liked", icon: <Heart className="w-6 h-6" /> },
-    { id: "history", label: "History", icon: <Clock className="w-6 h-6" /> },
+  const tabs = [
+    { id: "home" as const, label: "Home", icon: <Home className="w-6 h-6" /> },
+    { id: "liked" as const, label: "Liked", icon: <Heart className="w-6 h-6" /> },
+    { id: "history" as const, label: "History", icon: <Clock className="w-6 h-6" /> },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50">
-      <div className="flex justify-around items-center h-16">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50 h-14">
+      <div className="flex justify-around items-center h-full">
         {tabs.map((tab) => (
           <button
             key={tab.id}
