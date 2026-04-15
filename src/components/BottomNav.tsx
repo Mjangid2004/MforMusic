@@ -10,7 +10,8 @@ export default function BottomNav() {
 
   const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-  const handleInstall = () => {
+  const handleInstall = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setShowInstallHelp(true);
   };
 
@@ -30,8 +31,11 @@ export default function BottomNav() {
   return (
     <>
       {showInstallHelp && (
-        <div className="md:hidden fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6">
-          <div className="bg-neutral-900 rounded-2xl p-6 max-w-sm w-full">
+        <div 
+          className="md:hidden fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6"
+          onClick={(e) => { e.stopPropagation(); setShowInstallHelp(false); }}
+        >
+          <div className="bg-neutral-900 rounded-2xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">Install MforMusic</h3>
             {isIOS ? (
               <div className="space-y-3 text-sm">

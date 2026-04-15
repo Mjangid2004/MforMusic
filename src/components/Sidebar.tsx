@@ -12,7 +12,8 @@ export default function Sidebar() {
 
   const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-  const handleInstall = () => {
+  const handleInstall = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setShowInstallHelp(true);
   };
 
