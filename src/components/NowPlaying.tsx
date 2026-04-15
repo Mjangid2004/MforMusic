@@ -6,7 +6,7 @@ import ProgressBar from "@/components/ProgressBar";
 import Controls from "@/components/Controls";
 import VolumeControl from "@/components/VolumeControl";
 import YouTubePlayer from "@/components/YouTubePlayer";
-import { X, Music2 } from "lucide-react";
+import { X, Music2, Heart } from "lucide-react";
 
 const MOCK_LYRICS: { [key: string]: string } = {
   default: `♪ ♫ ♪
@@ -20,59 +20,95 @@ when available for this song.
 };
 
 export default function NowPlaying() {
-  const { state } = usePlayer();
+  const { state, toggleFavorite, isFavorite } = usePlayer();
   const [showLyrics, setShowLyrics] = useState(false);
   const currentSong = state.queue[state.currentIndex];
 
   const lyrics = currentSong ? (MOCK_LYRICS[currentSong.id] || MOCK_LYRICS.default) : MOCK_LYRICS.default;
+  const liked = currentSong ? isFavorite(currentSong) : false;
 
   return (
     <>
-      <div className={`fixed inset-0 z-50 bg-black/95 transition-transform duration-300 ${showLyrics ? 'translate-y-0' : 'translate-y-full'}`}>
+      {/* Full Screen Player */}
+      <div className={`fixed inset-0 z-50 bg-black transition-transform duration-300 ${showLyrics ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="h-full flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
-            <span className="text-sm text-gray-400">Now Playing</span>
+          {/* Header */}
+          <div className="flex items-center justify-between p-4">
             <button
               onClick={() => setShowLyrics(false)}
               className="p-2 hover:bg-white/10 rounded-full"
             >
               <X className="w-6 h-6" />
             </button>
+            <span className="text-sm text-gray-400">Now Playing</span>
+            <div className="w-10"></div>
           </div>
           
-          <div className="flex-1 flex">
-            <div className="flex-1 flex items-center justify-center p-8">
+          {/* Album Art - Full Width on Mobile */}
+          <div className="flex-1 flex items-center justify-center px-8 py-4">
+            {currentSong && (
+              <img
+                src={currentSong.thumbnail}
+                alt={currentSong.title}
+                className="w-full max-w-md max-h-80 md:max-h-96 rounded-xl object-cover shadow-2xl"
+              />
+            )}
+          </div>
+          
+          {/* Song Info & Controls */}
+          <div className="px-6 py-4 space-y-4">
+            {/* Song Title & Artist */}
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg md:text-xl font-bold truncate">{currentSong?.title || 'No song'}</h2>
+                <p className="text-gray-400 text-sm truncate">{currentSong?.artist || 'Unknown Artist'}</p>
+              </div>
+              {/* Like Button */}
               {currentSong && (
-                <img
-                  src={currentSong.thumbnail}
-                  alt={currentSong.title}
-                  className="w-80 h-80 rounded-xl object-cover shadow-2xl"
-                />
+                <button
+                  onClick={() => toggleFavorite(currentSong)}
+                  className="p-2 hover:bg-white/10 rounded-full flex-shrink-0"
+                >
+                  <Heart className={`w-6 h-6 ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+                </button>
               )}
             </div>
-            
-            <div className="w-96 border-l border-white/10 p-6 overflow-y-auto">
-              <h2 className="text-xl font-bold mb-2">{currentSong?.title || 'No song'}</h2>
-              <p className="text-gray-400 mb-6">{currentSong?.artist || 'Unknown Artist'}</p>
-              
-              <div className="bg-white/5 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Music2 className="w-5 h-5 text-indigo-400" />
-                  <span className="font-semibold">Lyrics</span>
-                </div>
-                <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line font-mono">
-                  {lyrics}
-                </div>
-              </div>
+
+            {/* Progress Bar */}
+            <div className="hidden md:block">
+              <ProgressBar />
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center justify-center">
+              <Controls />
+            </div>
+
+            {/* Mobile Progress Bar */}
+            <div className="md:hidden">
+              <ProgressBar />
             </div>
           </div>
-          
-          <div className="p-4 border-t border-white/10">
-            <ProgressBar />
+
+          {/* Lyrics Toggle - Mobile Only */}
+          <div className="md:hidden p-4 border-t border-white/10">
+            <button
+              onClick={() => setShowLyrics(true)}
+              className="w-full py-3 bg-white/10 rounded-xl flex items-center justify-center gap-2"
+            >
+              <Music2 className="w-5 h-5" />
+              <span>View Lyrics</span>
+            </button>
           </div>
         </div>
       </div>
 
+      {/* Desktop Side Panel for Lyrics */}
+      <div className="hidden md:block fixed inset-0 z-50 bg-black/95 transition-transform duration-300" style={{ display: 'none' }}>
+        {/* Desktop lyrics panel if needed */}
+      </div>
+
+      {/* Bottom Bar */}
       <div className="h-24 md:h-28 bg-gradient-to-t from-black to-black/95 border-t border-white/10 px-4 flex items-center gap-4 pb-20 md:pb-0">
         <div className="flex items-center gap-3 w-40 md:w-64 cursor-pointer flex-shrink-0" onClick={() => setShowLyrics(true)}>
           {currentSong ? (
@@ -101,11 +137,10 @@ export default function NowPlaying() {
 
         <div className="hidden md:flex w-64 items-center justify-end gap-4">
           <button
-            onClick={() => setShowLyrics(true)}
+            onClick={() => toggleFavorite(currentSong!)}
             className="p-2 hover:bg-white/10 rounded-full"
-            title="Lyrics"
           >
-            <Music2 className="w-5 h-5" />
+            <Heart className={`w-5 h-5 ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
           </button>
           <VolumeControl />
         </div>
