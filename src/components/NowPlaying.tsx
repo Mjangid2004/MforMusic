@@ -73,14 +73,14 @@ export default function NowPlaying() {
         </div>
       </div>
 
-      <div className="h-28 bg-gradient-to-t from-black to-black/95 border-t border-white/10 px-4 flex items-center gap-4 pb-16 md:pb-0">
-        <div className="flex items-center gap-3 w-64 cursor-pointer" onClick={() => setShowLyrics(true)}>
+      <div className="h-24 md:h-28 bg-gradient-to-t from-black to-black/95 border-t border-white/10 px-4 flex items-center gap-4 pb-20 md:pb-0">
+        <div className="flex items-center gap-3 w-40 md:w-64 cursor-pointer flex-shrink-0" onClick={() => setShowLyrics(true)}>
           {currentSong ? (
             <>
               <img
                 src={currentSong.thumbnail}
                 alt={currentSong.title}
-                className="w-16 h-16 rounded object-cover cursor-pointer hover:scale-105 transition-transform"
+                className="w-12 h-12 md:w-16 md:h-16 rounded object-cover cursor-pointer hover:scale-105 transition-transform flex-shrink-0"
               />
               <div className="overflow-hidden">
                 <p className="font-medium truncate text-sm cursor-pointer">{currentSong.title}</p>
@@ -94,12 +94,12 @@ export default function NowPlaying() {
 
         <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto">
           <Controls />
-          <div className="w-full mt-2">
+          <div className="w-full mt-2 hidden md:block">
             <ProgressBar />
           </div>
         </div>
 
-        <div className="w-64 flex items-center justify-end gap-4">
+        <div className="hidden md:flex w-64 items-center justify-end gap-4">
           <button
             onClick={() => setShowLyrics(true)}
             className="p-2 hover:bg-white/10 rounded-full"
