@@ -21,6 +21,7 @@ when available for this song.
 
 export default function NowPlaying() {
   const { state, toggleFavorite, isFavorite } = usePlayer();
+  const [showPlayer, setShowPlayer] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
   const currentSong = state.queue[state.currentIndex];
 
@@ -30,18 +31,23 @@ export default function NowPlaying() {
   return (
     <>
       {/* Full Screen Player */}
-      <div className={`fixed inset-0 z-50 bg-black transition-transform duration-300 ${showLyrics ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div className={`fixed inset-0 z-50 bg-black transition-transform duration-300 ${showPlayer ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4">
             <button
-              onClick={() => setShowLyrics(false)}
+              onClick={() => setShowPlayer(false)}
               className="p-2 hover:bg-white/10 rounded-full"
             >
               <X className="w-6 h-6" />
             </button>
             <span className="text-sm text-gray-400">Now Playing</span>
-            <div className="w-10"></div>
+            <button
+              onClick={() => setShowLyrics(true)}
+              className="p-2 hover:bg-white/10 rounded-full"
+            >
+              <Music2 className="w-6 h-6" />
+            </button>
           </div>
           
           {/* Album Art */}
@@ -50,7 +56,7 @@ export default function NowPlaying() {
               <img
                 src={currentSong.thumbnail}
                 alt={currentSong.title}
-                className="w-full max-w-md max-h-80 lg:max-h-96 rounded-xl object-cover shadow-2xl"
+                className="w-full max-w-md max-h-72 md:max-h-96 rounded-xl object-cover shadow-2xl"
               />
             )}
           </div>
@@ -60,7 +66,7 @@ export default function NowPlaying() {
             {/* Song Title & Artist */}
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0 pr-4">
-                <h2 className="text-lg lg:text-xl font-bold truncate">{currentSong?.title || 'No song'}</h2>
+                <h2 className="text-lg md:text-xl font-bold truncate">{currentSong?.title || 'No song'}</h2>
                 <p className="text-gray-400 text-sm truncate">{currentSong?.artist || 'Unknown Artist'}</p>
               </div>
               {/* Like Button */}
@@ -78,14 +84,12 @@ export default function NowPlaying() {
             <ProgressBar />
 
             {/* Controls */}
-            <div className="flex items-center justify-center">
-              <Controls />
-            </div>
+            <Controls />
 
-            {/* Lyrics Toggle */}
+            {/* Lyrics Toggle - Desktop */}
             <button
               onClick={() => setShowLyrics(true)}
-              className="w-full py-3 bg-white/10 rounded-xl flex items-center justify-center gap-2"
+              className="hidden md:flex w-full py-3 bg-white/10 rounded-xl items-center justify-center gap-2"
             >
               <Music2 className="w-5 h-5" />
               <span>View Lyrics</span>
@@ -98,13 +102,14 @@ export default function NowPlaying() {
       <div className={`fixed inset-0 z-50 bg-black/95 transition-transform duration-300 ${showLyrics ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-white/10">
-            <span className="text-sm text-gray-400">Lyrics</span>
             <button
               onClick={() => setShowLyrics(false)}
               className="p-2 hover:bg-white/10 rounded-full"
             >
               <X className="w-6 h-6" />
             </button>
+            <span className="text-sm text-gray-400">Lyrics</span>
+            <div className="w-10"></div>
           </div>
           
           <div className="flex-1 overflow-y-auto p-6">
@@ -126,7 +131,7 @@ export default function NowPlaying() {
 
       {/* Bottom Bar - Desktop */}
       <div className="hidden md:block h-28 bg-gradient-to-t from-black to-black/95 border-t border-white/10 px-4 flex items-center gap-4">
-        <div className="flex items-center gap-3 w-64 cursor-pointer" onClick={() => setShowLyrics(false)}>
+        <div className="flex items-center gap-3 w-64 cursor-pointer" onClick={() => setShowPlayer(true)}>
           {currentSong ? (
             <>
               <img
@@ -163,8 +168,8 @@ export default function NowPlaying() {
       </div>
 
       {/* Bottom Bar - Mobile (Compact) */}
-      <div className="md:hidden fixed bottom-14 left-0 right-0 h-16 bg-neutral-900 border-t border-neutral-800 px-3 flex items-center gap-3 z-40">
-        <div className="flex items-center gap-2 w-48 cursor-pointer flex-shrink-0" onClick={() => setShowLyrics(false)}>
+      <div className="md:hidden fixed bottom-14 left-0 right-0 h-16 bg-neutral-900 border-t border-neutral-800 px-3 flex items-center gap-2 z-40">
+        <div className="flex items-center gap-2 w-36 cursor-pointer flex-shrink-0" onClick={() => setShowPlayer(true)}>
           {currentSong ? (
             <>
               <img
@@ -185,6 +190,13 @@ export default function NowPlaying() {
         <div className="flex-1 flex justify-center">
           <Controls />
         </div>
+
+        <button
+          onClick={() => currentSong && toggleFavorite(currentSong)}
+          className="p-2 hover:bg-white/10 rounded-full flex-shrink-0"
+        >
+          <Heart className={`w-5 h-5 ${liked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+        </button>
       </div>
 
       <YouTubePlayer />

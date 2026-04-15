@@ -11,13 +11,13 @@ export default function Controls() {
   const getPlayModeIcon = () => {
     switch (state.playMode) {
       case "shuffle":
-        return <Shuffle className="w-5 h-5" />;
+        return <Shuffle className="w-4 h-4 md:w-5 md:h-5" />;
       case "repeat2":
-        return <Repeat2 className="w-5 h-5" />;
+        return <Repeat2 className="w-4 h-4 md:w-5 md:h-5" />;
       case "repeat-all":
-        return <Repeat className="w-5 h-5 fill-current" />;
+        return <Repeat className="w-4 h-4 md:w-5 md:h-5 fill-current" />;
       default:
-        return <Repeat className="w-5 h-5" />;
+        return <Repeat className="w-4 h-4 md:w-5 md:h-5" />;
     }
   };
 
@@ -39,11 +39,11 @@ export default function Controls() {
   };
 
   return (
-    <div className="flex items-center justify-center gap-4">
+    <div className="flex items-center justify-center gap-2 md:gap-4">
       <button
         onClick={cyclePlayMode}
         title={getPlayModeLabel()}
-        className={`p-2 rounded-full transition-all duration-300 ${
+        className={`p-1 md:p-2 rounded-full transition-all duration-300 ${
           state.playMode !== "order"
             ? "text-indigo-400"
             : "text-gray-400 hover:text-white"
@@ -55,32 +55,32 @@ export default function Controls() {
       <button
         onClick={prevSong}
         disabled={!currentSong}
-        className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <SkipBack className="w-6 h-6" />
+        <SkipBack className="w-5 h-5 md:w-6 md:h-6" />
       </button>
 
       <button
         onClick={togglePlay}
         disabled={!currentSong}
-        className="p-4 rounded-full bg-indigo-500 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
+        className="p-3 md:p-4 rounded-full bg-indigo-500 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
       >
         {state.isPlaying ? (
-          <Pause className="w-8 h-8" />
+          <Pause className="w-6 h-6 md:w-8 md:h-8" />
         ) : (
-          <Play className="w-8 h-8 ml-1" />
+          <Play className="w-6 h-6 md:w-8 md:h-8 ml-0.5" />
         )}
       </button>
 
       <button
         onClick={nextSong}
         disabled={!currentSong}
-        className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <SkipForward className="w-6 h-6" />
+        <SkipForward className="w-5 h-5 md:w-6 md:h-6" />
       </button>
 
-      <div className="w-10" />
+      <div className="w-8 md:w-10" />
     </div>
   );
 }
