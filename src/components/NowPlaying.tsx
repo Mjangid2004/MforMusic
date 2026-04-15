@@ -168,22 +168,22 @@ export default function NowPlaying() {
       </div>
 
       {/* Bottom Bar - Mobile (Compact) */}
-      <div className="md:hidden fixed bottom-14 left-0 right-0 h-16 bg-neutral-900 border-t border-neutral-800 px-3 flex items-center gap-2 z-40">
-        <div className="flex items-center gap-2 w-36 cursor-pointer flex-shrink-0" onClick={() => setShowPlayer(true)}>
+      <div className="md:hidden fixed bottom-14 left-0 right-0 h-20 bg-neutral-900 border-t border-neutral-800 px-3 flex items-center gap-2 z-40">
+        <div className="flex items-center gap-2 w-32 cursor-pointer flex-shrink-0" onClick={() => setShowPlayer(true)}>
           {currentSong ? (
             <>
               <img
                 src={currentSong.thumbnail}
                 alt={currentSong.title}
-                className="w-12 h-12 rounded object-cover cursor-pointer flex-shrink-0"
+                className="w-10 h-10 rounded object-cover cursor-pointer flex-shrink-0"
               />
               <div className="overflow-hidden">
-                <p className="font-medium text-sm truncate">{currentSong.title}</p>
+                <p className="font-medium text-xs truncate">{currentSong.title}</p>
                 <p className="text-xs text-gray-400 truncate">{currentSong.artist}</p>
               </div>
             </>
           ) : (
-            <div className="text-sm text-gray-500">No song</div>
+            <div className="text-xs text-gray-500">No song</div>
           )}
         </div>
 
