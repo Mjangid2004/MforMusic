@@ -12,7 +12,7 @@ const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function PlaylistTabs() {
-  const { state, dispatch } = usePlayer();
+  const { state, setCurrentTab } = usePlayer();
 
   const getCount = (tabId: Tab) => {
     switch (tabId) {
@@ -32,7 +32,7 @@ export default function PlaylistTabs() {
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => dispatch({ type: "SET_TAB", payload: tab.id })}
+          onClick={() => setCurrentTab(tab.id)}
           className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all duration-300 ${
             state.currentTab === tab.id
               ? "bg-indigo-500 text-white"

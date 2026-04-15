@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from "react";
-import { Song, PlayMode, Theme, PlayerState } from "@/lib/types";
+import { Song, PlayMode, Theme, PlayerState, Tab } from "@/lib/types";
 
 type Action =
   | { type: "SET_QUEUE"; payload: Song[] }
@@ -14,6 +14,8 @@ type Action =
   | { type: "SET_REPEAT_COUNT"; payload: number }
   | { type: "SET_VOLUME"; payload: number }
   | { type: "SET_THEME"; payload: Theme }
+  | { type: "SET_TAB"; payload: Tab }
+  | { type: "SET_SEARCH_RESULTS"; payload: Song[] }
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "TOGGLE_FAVORITE"; payload: Song }
   | { type: "SET_CURRENT_TIME"; payload: number }
@@ -33,6 +35,7 @@ interface PlayerState {
   volume: number;
   isPlaying: boolean;
   theme: Theme;
+  currentTab: Tab;
   searchResults: Song[];
   isLoading: boolean;
   currentTime: number;
@@ -50,6 +53,7 @@ const initialState: PlayerState = {
   volume: 0.7,
   isPlaying: false,
   theme: "dark",
+  currentTab: "search",
   searchResults: [],
   isLoading: false,
   currentTime: 0,
@@ -104,6 +108,10 @@ function reducer(state: PlayerState, action: Action): PlayerState {
       return { ...state, volume: action.payload };
     case "SET_THEME":
       return { ...state, theme: action.payload };
+    case "SET_TAB":
+      return { ...state, currentTab: action.payload };
+    case "SET_SEARCH_RESULTS":
+      return { ...state, searchResults: action.payload };
     case "SET_LOADING":
       return { ...state, isLoading: action.payload };
     case "TOGGLE_FAVORITE": {
@@ -288,6 +296,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       .filter(Boolean) as Song[];
   }, [state.history, state.favorites, state.queue]);
 
+  const setCurrentTab = useCallback((tab: Tab) => {
+    dispatch({ type: "SET_TAB", payload: tab });
+  }, [dispatch]);
+
   return (
     <PlayerContext.Provider
       value={{
@@ -301,6 +313,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         toggleFavorite,
         isFavorite,
         getTopPlayed,
+        setCurrentTab,
       }}
     >
       {children}

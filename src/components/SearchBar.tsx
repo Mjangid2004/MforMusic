@@ -6,7 +6,7 @@ import { Song } from "@/lib/types";
 import { Search, X, Loader2, Sparkles } from "lucide-react";
 
 export default function SearchBar() {
-  const { state, dispatch, playSong } = usePlayer();
+  const { state, dispatch, playSong, setCurrentTab } = usePlayer();
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [recommendations, setRecommendations] = useState<Song[]>([]);
@@ -75,7 +75,7 @@ export default function SearchBar() {
 
   const handlePlayRecommendation = (song: Song) => {
     playSong(song, recommendations);
-    dispatch({ type: "SET_TAB", payload: "search" });
+    setCurrentTab("search");
   };
 
   const handleClear = () => {

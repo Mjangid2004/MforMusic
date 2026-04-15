@@ -5,7 +5,7 @@ import SongItem from "./SongItem";
 import { Loader2 } from "lucide-react";
 
 export default function Playlist() {
-  const { state, getTopPlayed } = usePlayer();
+  const { state, getTopPlayed, setCurrentTab } = usePlayer();
 
   const getSongs = () => {
     switch (state.currentTab) {
