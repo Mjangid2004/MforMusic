@@ -1,5 +1,11 @@
 # 🎵 Free Music Player - Complete Guide
 
+## 🚀 Live Demo
+
+**Try it now:** https://mfor-music.vercel.app
+
+---
+
 ## What is this App?
 
 A **completely free, ad-free music player** that lets you:
