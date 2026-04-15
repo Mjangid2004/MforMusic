@@ -1,8 +1,23 @@
-# 🎵 Free Music Player - Complete Guide
+# 🎵 MforMusic - Free Ad-Free Music Player
 
 ## 🚀 Live Demo
 
 **Try it now:** https://mfor-music.vercel.app
+
+## 📱 Install as App (PWA)
+
+You can install MforMusic on your phone like any other app!
+
+### On Mobile (Chrome / Safari):
+1. Open **https://mfor-music.vercel.app** in your mobile browser
+2. Tap the **"Install"** button at the top (or use browser menu)
+3. Tap **"Add to Home Screen"**
+4. Done! MforMusic will appear on your home screen 🎉
+
+### On Desktop (Chrome / Edge):
+1. Open **https://mfor-music.vercel.app**
+2. Click the **install icon** in the address bar
+3. Or use menu → **"Install MforMusic"**
 
 ---
 
