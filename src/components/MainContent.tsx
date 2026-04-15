@@ -6,14 +6,14 @@ import { useAppContext } from "@/context/AppContext";
 import { Song } from "@/lib/types";
 
 const GENRES = [
-  { name: "Haryanvi", query: "haryanvi songs", color: "from-orange-500 to-red-500" },
-  { name: "Bollywood", query: "bollywood hits", color: "from-purple-500 to-pink-500" },
-  { name: "Punjabi", query: "punjabi songs", color: "from-green-500 to-teal-500" },
-  { name: "Rajasthani", query: "rajasthani folk", color: "from-pink-500 to-rose-500" },
-  { name: "Hip Hop", query: "hip hop songs", color: "from-blue-500 to-indigo-500" },
-  { name: "Lo-Fi", query: "lofi music", color: "from-cyan-500 to-blue-500" },
-  { name: "EDM", query: "edm party", color: "from-lime-500 to-green-500" },
-  { name: "Mix", query: "top hits mix", color: "from-yellow-500 to-purple-500" },
+  { name: "Haryanvi", query: "haryanvi song 2024", color: "from-orange-500 to-red-500" },
+  { name: "Bollywood", query: "bollywood song 2024", color: "from-purple-500 to-pink-500" },
+  { name: "Punjabi", query: "punjabi song 2024", color: "from-green-500 to-teal-500" },
+  { name: "Rajasthani", query: "rajasthani song", color: "from-pink-500 to-rose-500" },
+  { name: "Hip Hop", query: "hip hop song 2024", color: "from-blue-500 to-indigo-500" },
+  { name: "Lo-Fi", query: "lofi song 2024", color: "from-cyan-500 to-blue-500" },
+  { name: "Trending", query: "trending song 2024", color: "from-yellow-500 to-orange-500" },
+  { name: "Mix", query: "english song 2024 popular", color: "from-yellow-500 to-purple-500" },
 ];
 
 export default function MainContent() {
