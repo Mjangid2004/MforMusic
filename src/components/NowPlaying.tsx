@@ -73,7 +73,7 @@ export default function NowPlaying() {
         </div>
       </div>
 
-      <div className="h-28 bg-gradient-to-t from-black to-black/95 border-t border-white/10 px-4 flex items-center gap-4">
+      <div className="h-28 bg-gradient-to-t from-black to-black/95 border-t border-white/10 px-4 flex items-center gap-4 pb-16 md:pb-0">
         <div className="flex items-center gap-3 w-64 cursor-pointer" onClick={() => setShowLyrics(true)}>
           {currentSong ? (
             <>
