@@ -18,9 +18,7 @@ const GENRES = [
 
 export default function MainContent() {
   const { state, playSong, dispatch, toggleFavorite, isFavorite } = usePlayer();
-  const { viewMode, setViewMode } = useAppContext();
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { viewMode, setViewMode, searchQuery, setSearchQuery, showSearch, setShowSearch } = useAppContext();
   const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<typeof GENRES[0] | null>(null);
