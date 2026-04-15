@@ -36,8 +36,10 @@ interface PlayerState {
   isPlaying: boolean;
   theme: Theme;
   currentTab: Tab;
+  searchQuery: string;
   searchResults: Song[];
   isLoading: boolean;
+  isStreamLoading: boolean;
   currentTime: number;
   duration: number;
   dynamicColors: [string, string];
@@ -54,8 +56,10 @@ const initialState: PlayerState = {
   isPlaying: false,
   theme: "dark",
   currentTab: "search",
+  searchQuery: "",
   searchResults: [],
   isLoading: false,
+  isStreamLoading: false,
   currentTime: 0,
   duration: 0,
   dynamicColors: ["#6366f1", "#8b5cf6"],
