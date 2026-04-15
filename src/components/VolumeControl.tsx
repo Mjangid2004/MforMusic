@@ -8,9 +8,6 @@ export default function VolumeControl() {
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "SET_VOLUME", payload: parseFloat(e.target.value) });
-    if (state.soundRef?.current) {
-      state.soundRef.current.volume(parseFloat(e.target.value));
-    }
   };
 
   const toggleMute = () => {
