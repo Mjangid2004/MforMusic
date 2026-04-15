@@ -2,21 +2,16 @@
 
 import { useAppContext } from "@/context/AppContext";
 import { Home, Heart, Clock, ListMusic, Download } from "lucide-react";
+import { useState } from "react";
 
 export default function BottomNav() {
   const { viewMode, setViewMode, clearSearch } = useAppContext();
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+
+  const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   const handleInstall = () => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    
-    if (isIOS) {
-      alert("To install: Tap Share → Add to Home Screen");
-    } else {
-      const installBtn = document.getElementById('install-btn');
-      if (installBtn) {
-        (installBtn as any).click();
-      }
-    }
+    setShowInstallHelp(true);
   };
 
   const tabs = [
@@ -27,36 +22,65 @@ export default function BottomNav() {
   ];
 
   const handleTabClick = (tabId: typeof tabs[0]['id']) => {
+    setShowInstallHelp(false);
     clearSearch();
     setViewMode(tabId);
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50 h-14">
-      <div className="flex justify-around items-center h-full">
-        {tabs.map((tab) => (
+    <>
+      {showInstallHelp && (
+        <div className="md:hidden fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6">
+          <div className="bg-neutral-900 rounded-2xl p-6 max-w-sm w-full">
+            <h3 className="text-xl font-bold mb-4">Install MforMusic</h3>
+            {isIOS ? (
+              <div className="space-y-3 text-sm">
+                <p>1. Tap the <strong>Share</strong> button (square with up arrow)</p>
+                <p>2. Scroll down and tap <strong>"Add to Home Screen"</strong></p>
+                <p>3. Tap <strong>"Add"</strong></p>
+              </div>
+            ) : (
+              <div className="space-y-3 text-sm">
+                <p>1. Tap the <strong>menu button</strong> (three dots) in top right</p>
+                <p>2. Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong></p>
+                <p>3. Tap <strong>"Install"</strong></p>
+              </div>
+            )}
+            <button
+              onClick={() => setShowInstallHelp(false)}
+              className="w-full mt-6 py-3 bg-indigo-500 rounded-xl font-medium"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+      
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50 h-14">
+        <div className="flex justify-around items-center h-full">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                viewMode === tab.id
+                  ? "text-indigo-500"
+                  : "text-gray-500 hover:text-white"
+              }`}
+            >
+              {tab.icon}
+              <span className="text-xs mt-1">{tab.label}</span>
+            </button>
+          ))}
           <button
-            key={tab.id}
-            onClick={() => handleTabClick(tab.id)}
-            className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
-              viewMode === tab.id
-                ? "text-indigo-500"
-                : "text-gray-500 hover:text-white"
-            }`}
+            onClick={handleInstall}
+            className="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-white transition-colors"
           >
-            {tab.icon}
-            <span className="text-xs mt-1">{tab.label}</span>
+            <Download className="w-6 h-6" />
+            <span className="text-xs mt-1">Install</span>
           </button>
-        ))}
-        <button
-          onClick={handleInstall}
-          className="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-white transition-colors"
-        >
-          <Download className="w-6 h-6" />
-          <span className="text-xs mt-1">Install</span>
-        </button>
+        </div>
       </div>
-      <button id="install-btn" style={{ display: 'none' }} />
-    </div>
+    </>
   );
 }
