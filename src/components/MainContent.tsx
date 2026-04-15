@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { useAppContext } from "@/app/page";
+import { useAppContext } from "@/context/AppContext";
 import { Song } from "@/lib/types";
 
 const GENRES = [

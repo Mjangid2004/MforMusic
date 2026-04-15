@@ -1,7 +1,7 @@
 "use client";
 
 import { usePlayer } from "@/context/PlayerContext";
-import { useAppContext } from "@/app/page";
+import { useAppContext } from "@/context/AppContext";
 import { Music2, Heart, Clock } from "lucide-react";
 
 export default function Sidebar() {
