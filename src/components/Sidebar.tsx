@@ -2,17 +2,33 @@
 
 import { usePlayer } from "@/context/PlayerContext";
 import { useAppContext } from "@/context/AppContext";
-import { Music2, Heart, Clock } from "lucide-react";
+import { Music2, Heart, Clock, ListMusic, Download } from "lucide-react";
 
 export default function Sidebar() {
   const { state } = usePlayer();
   const { viewMode, setViewMode } = useAppContext();
 
+  const handleInstall = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    if (isIOS) {
+      alert("📱 To install on iPhone:\n\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap 'Add to Home Screen'\n3. Tap 'Add'");
+      return;
+    }
+    
+    const trigger = document.getElementById('install-trigger') as any;
+    if (trigger && trigger.prompt) {
+      trigger.prompt();
+    } else {
+      alert("💡 To install:\n\nOn Chrome: Tap menu (⋮) → 'Install app'\n\nOr open the app in Chrome and look for the install icon in the address bar.");
+    }
+  };
+
   return (
     <div className="w-64 bg-black/40 p-4 flex flex-col">
       <div className="flex items-center gap-3 px-3 py-2 mb-4">
         <Music2 className="w-8 h-8 text-indigo-400" />
-        <span className="font-bold text-lg">MusicPlayer</span>
+        <span className="font-bold text-lg">MforMusic</span>
       </div>
 
       <div className="flex flex-col gap-2 mb-6">
@@ -24,6 +40,14 @@ export default function Sidebar() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           <span>Home</span>
+        </button>
+        <button
+          onClick={() => setViewMode('queue')}
+          className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'queue' ? 'bg-white/10' : 'hover:bg-white/5'}`}
+        >
+          <ListMusic className={`w-5 h-5 ${viewMode === 'queue' ? 'text-indigo-400' : 'text-gray-400'}`} />
+          <span>Queue</span>
+          <span className="ml-auto text-xs text-gray-400">{state.queue.length}</span>
         </button>
         <button
           onClick={() => setViewMode('liked')}
@@ -38,7 +62,14 @@ export default function Sidebar() {
           className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'history' ? 'bg-white/10' : 'hover:bg-white/5'}`}
         >
           <Clock className={`w-5 h-5 ${viewMode === 'history' ? 'text-blue-500' : 'text-gray-400'}`} />
-          <span>Recently Played</span>
+          <span>History</span>
+        </button>
+        <button
+          onClick={handleInstall}
+          className="flex items-center gap-4 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400"
+        >
+          <Download className="w-5 h-5" />
+          <span>Install App</span>
         </button>
       </div>
 

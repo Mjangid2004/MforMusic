@@ -10,7 +10,6 @@ import BottomNav from "@/components/BottomNav";
 
 function MusicPlayerApp() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showInstall, setShowInstall] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -22,11 +21,16 @@ function MusicPlayerApp() {
       });
     }
 
-    // PWA Install prompt
+    // PWA Install prompt handler
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowInstall(true);
+      
+      // Auto-click install button if exists
+      const installBtn = document.getElementById('install-trigger');
+      if (installBtn) {
+        (installBtn as any).prompt = e;
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -36,34 +40,35 @@ function MusicPlayerApp() {
     };
   }, []);
 
-  const handleInstall = async () => {
-    if (!deferredPrompt) return;
+  const handleInstallClick = async () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setShowInstall(false);
+    if (isIOS) {
+      alert("📱 To install on iPhone:\n\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap 'Add to Home Screen'\n3. Tap 'Add'");
+      return;
     }
-    setDeferredPrompt(null);
+
+    const trigger = document.getElementById('install-trigger') as any;
+    if (trigger && trigger.prompt) {
+      trigger.prompt();
+      const { outcome } = await trigger.prompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User accepted install');
+      }
+    } else {
+      alert("💡 To install:\n\nOn Chrome: Tap menu (⋮) → 'Install app'\n\nOr open the app in Chrome and look for the install icon in the address bar.");
+    }
   };
 
   return (
     <PlayerProvider>
       <AppProvider>
         <div className="h-screen flex flex-col bg-black text-white overflow-hidden">
-          {/* Install Banner */}
-          {showInstall && (
-            <div className="bg-indigo-600 px-4 py-3 flex items-center justify-between md:hidden">
-              <span className="text-sm">Install MforMusic</span>
-              <button
-                onClick={handleInstall}
-                className="bg-white text-indigo-600 px-4 py-1 rounded-full text-sm font-medium"
-              >
-                Install
-              </button>
-            </div>
-          )}
+          <button 
+            id="install-trigger" 
+            style={{ display: 'none' }} 
+            onClick={handleInstallClick}
+          />
           
           <div className="flex-1 flex overflow-hidden">
             {/* Desktop Sidebar */}

@@ -1,10 +1,23 @@
 "use client";
 
 import { useAppContext } from "@/context/AppContext";
-import { Home, Heart, Clock, ListMusic } from "lucide-react";
+import { Home, Heart, Clock, ListMusic, Download } from "lucide-react";
 
 export default function BottomNav() {
   const { viewMode, setViewMode, clearSearch } = useAppContext();
+
+  const handleInstall = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    if (isIOS) {
+      alert("To install: Tap Share → Add to Home Screen");
+    } else {
+      const installBtn = document.getElementById('install-btn');
+      if (installBtn) {
+        (installBtn as any).click();
+      }
+    }
+  };
 
   const tabs = [
     { id: "home" as const, label: "Home", icon: <Home className="w-6 h-6" /> },
@@ -35,7 +48,15 @@ export default function BottomNav() {
             <span className="text-xs mt-1">{tab.label}</span>
           </button>
         ))}
+        <button
+          onClick={handleInstall}
+          className="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-white transition-colors"
+        >
+          <Download className="w-6 h-6" />
+          <span className="text-xs mt-1">Install</span>
+        </button>
       </div>
+      <button id="install-btn" style={{ display: 'none' }} />
     </div>
   );
 }
