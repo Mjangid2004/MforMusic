@@ -123,7 +123,7 @@ export default function MainContent() {
       }
     }
 
-    if (fileInputRef.current) fileInputRef.value = "";
+    if (fileInputRef.current) (fileInputRef.current as HTMLInputElement).value = "";
   };
 
   const formatDuration = (seconds: number) => {
