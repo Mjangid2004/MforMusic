@@ -5,6 +5,7 @@ export interface Song {
   thumbnail: string;
   duration: number;
   videoId: string;
+  isLocal?: boolean;
 }
 
 export type PlayMode = "order" | "once" | "repeat2" | "repeat-all" | "shuffle";
