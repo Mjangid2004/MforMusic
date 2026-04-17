@@ -2,7 +2,7 @@
 
 import { usePlayer } from "@/context/PlayerContext";
 import { useAppContext } from "@/context/AppContext";
-import { Music2, Heart, Clock, ListMusic, Download, Folder, PlusSquare, ListPlus } from "lucide-react";
+import { Music2, Heart, Clock, ListMusic, Download, PlusSquare } from "lucide-react";
 import { useState } from "react";
 
 export default function Sidebar() {
@@ -90,14 +90,6 @@ export default function Sidebar() {
           >
             <Clock className={`w-5 h-5 ${viewMode === 'history' ? 'text-blue-500' : 'text-gray-400'}`} />
             <span>History</span>
-          </button>
-          <button
-            onClick={() => handleTabClick('local')}
-            className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'local' ? 'bg-white/10' : 'hover:bg-white/5'}`}
-          >
-            <Folder className={`w-5 h-5 ${viewMode === 'local' ? 'text-green-500' : 'text-gray-400'}`} />
-            <span>Local Songs</span>
-            <span className="ml-auto text-xs text-gray-400">{state.localSongs.length}</span>
           </button>
           <button
             onClick={() => handleTabClick('playlists')}
