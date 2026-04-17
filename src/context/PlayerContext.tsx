@@ -332,7 +332,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const currentSong = state.queue[state.currentIndex];
         if (currentSong?.videoId) {
           try {
-            const response = await fetch(`/api/search?videoId=${encodeURIComponent(currentSong.videoId)}&related=true`);
+            const response = await fetch("/api/search", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                videoId: currentSong.videoId,
+                artistName: currentSong.artist,
+                songTitle: currentSong.title,
+              }),
+            });
             const data = await response.json();
             if (data.results && Array.isArray(data.results)) {
               const relatedSongs = data.results;

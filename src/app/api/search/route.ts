@@ -6,12 +6,6 @@ const CORS_PROXY = "https://api.codetabs.com/v1/proxy";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get("q");
-  const videoId = searchParams.get("videoId");
-  const related = searchParams.get("related");
-
-  if (related === "true" && videoId) {
-    return getRelatedSongs(videoId);
-  }
 
   if (!query) {
     return NextResponse.json({ results: [] });
@@ -112,9 +106,30 @@ function parseDuration(duration: string): number {
   return 0;
 }
 
-async function getRelatedSongs(videoId: string) {
+async function getRelatedSongs(videoId: string, artistName?: string, songTitle?: string) {
   try {
-    const searchUrl = `https://www.youtube.com/watch?v=${videoId}&pbj=1`;
+    const genrePatterns = [
+      "haryanvi", "bollywood", "punjabi", "bhojpuri", "rajasthani", "bihari",
+      "gujarati", "marathi", "bengali", "tamil", "telugu", "kannada", "malayalam",
+      "hindi", "english", "pop", "rock", "hip hop", "lofi", "lo-fi", "sad",
+      " romantic", "party", "dj", "remix", "old", "classic", "90s", "80s", "2000s"
+    ];
+
+    const detectGenre = (text: string): string | null => {
+      const lower = text.toLowerCase();
+      for (const pattern of genrePatterns) {
+        if (lower.includes(pattern)) return pattern;
+      }
+      return null;
+    };
+
+    const detectedGenre = detectGenre(songTitle || "") || detectGenre(artistName || "");
+    
+    const searchQuery = detectedGenre 
+      ? `${detectedGenre} song latest 2024 popular`
+      : "hindi song popular 2024";
+    
+    const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}&sp=EgIQAQ%3D%3D`;
     
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -134,62 +149,40 @@ async function getRelatedSongs(videoId: string) {
 
     const html = await response.text();
     const results: Song[] = [];
+    const currentVideoId = videoId;
     
-    const relatedVideosMatch = html.match(/"related_VIDEO_DETAILS"\s*:\s*({.*?})/s);
+    const ytInitialDataMatch = html.match(/ytInitialData\s*=\s*({.*?});/s);
     
-    if (relatedVideosMatch) {
+    if (ytInitialDataMatch) {
       try {
-        const data = JSON.parse(relatedVideosMatch[1]);
-        const videos = data?.relatedVideoDetails;
-
+        const data = JSON.parse(ytInitialDataMatch[1]);
+        const videos = data?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents;
+        
         if (videos && Array.isArray(videos)) {
-          for (const video of videos.slice(0, 15)) {
-            if (video?.videoId && video?.title) {
-              results.push({
-                id: video.videoId,
-                title: video.title,
-                artist: video.channelTitle || "YouTube",
-                thumbnail: `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`,
-                duration: video.lengthSeconds || 0,
-                videoId: video.videoId,
-              });
-            }
-          }
-        }
-      } catch (parseError) {
-        console.error("Parse related error:", parseError);
-      }
-    }
-
-    if (results.length === 0) {
-      const relatedUrl = `https://www.youtube.com/results?search_query=related:${videoId}`;
-      const relatedResponse = await fetch(`${CORS_PROXY}?quest=${encodeURIComponent(relatedUrl)}`, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        },
-      });
-      const relatedHtml = await relatedResponse.text();
-      
-      const ytInitialDataMatch = relatedHtml.match(/ytInitialData\s*=\s*({.*?});/s);
-      
-      if (ytInitialDataMatch) {
-        try {
-          const data = JSON.parse(ytInitialDataMatch[1]);
-          const videos = data?.contents?.twoColumnSearchResultsRenderer?.primary_contents?.sectionListRenderer?.contents;
-          
-          if (videos && Array.isArray(videos)) {
-            for (const section of videos) {
-              const items = section?.itemSectionRenderer?.contents;
-              if (items && Array.isArray(items)) {
-                for (const item of items.slice(0, 15)) {
-                  const video = item?.videoRenderer;
-                  if (video?.videoId && video?.title?.runs?.[0]?.text) {
-                    const vid = video.videoId;
-                    if (vid !== videoId) {
+          for (const section of videos) {
+            const items = section?.itemSectionRenderer?.contents;
+            if (items && Array.isArray(items)) {
+              for (const item of items) {
+                const video = item?.videoRenderer;
+                if (video?.videoId && video?.title?.runs?.[0]?.text) {
+                  const vid = video.videoId;
+                  const title = video.title.runs[0].text;
+                  const channel = video.ownerText?.runs?.[0]?.text || "YouTube";
+                  
+                  if (vid !== currentVideoId) {
+                    const titleLower = title.toLowerCase();
+                    const artistLower = channel.toLowerCase();
+                    const currentTitleLower = (songTitle || "").toLowerCase();
+                    const currentArtistLower = (artistName || "").toLowerCase();
+                    
+                    const isDuplicate = titleLower.includes(currentTitleLower.split(" ")[0]) && 
+                                      (titleLower.includes(currentTitleLower.split(" ").slice(-1)[0] || titleLower.length < currentTitleLower.length + 10);
+                    
+                    if (!isDuplicate) {
                       results.push({
                         id: vid,
-                        title: video.title.runs[0].text,
-                        artist: video.ownerText?.runs?.[0]?.text || "YouTube",
+                        title: title,
+                        artist: channel,
                         thumbnail: `https://img.youtube.com/vi/${vid}/mqdefault.jpg`,
                         duration: parseDuration(video.lengthText?.simpleText || "0:00"),
                         videoId: vid,
@@ -200,9 +193,9 @@ async function getRelatedSongs(videoId: string) {
               }
             }
           }
-        } catch (parseError) {
-          console.error("Parse related fallback error:", parseError);
         }
+      } catch (parseError) {
+        console.error("Parse error:", parseError);
       }
     }
 
@@ -211,4 +204,15 @@ async function getRelatedSongs(videoId: string) {
     console.error("Related songs error:", error);
     return NextResponse.json({ results: [], error: "Failed to get related songs" });
   }
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const { videoId, artistName, songTitle } = body;
+  
+  if (!videoId) {
+    return NextResponse.json({ results: [] });
+  }
+  
+  return getRelatedSongs(videoId, artistName, songTitle);
 }

@@ -13,15 +13,26 @@ export default function SearchBar() {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const lastSearchRef = useRef<string>("");
 
-  const fetchRecommendations = useCallback(async (searchTerm: string, currentVideoId?: string) => {
+  const fetchRecommendations = useCallback(async (searchTerm: string, currentVideoId?: string, artistName?: string, songTitle?: string) => {
     try {
-      let url = `/api/search?q=${encodeURIComponent(searchTerm)}`;
-      
       if (currentVideoId) {
-        url = `/api/search?videoId=${encodeURIComponent(currentVideoId)}&related=true`;
+        const response = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            videoId: currentVideoId,
+            artistName: artistName,
+            songTitle: songTitle,
+          }),
+        });
+        const data = await response.json();
+        if (data.results && Array.isArray(data.results)) {
+          setRecommendations(data.results.slice(0, 5));
+        }
+        return;
       }
       
-      const response = await fetch(url);
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}`);
       const data = await response.json();
       
       if (data.results && Array.isArray(data.results)) {
@@ -71,7 +82,7 @@ export default function SearchBar() {
     debounceRef.current = setTimeout(() => {
       const currentSong = state.queue[state.currentIndex];
       if (!query && currentSong?.videoId) {
-        fetchRecommendations("", currentSong.videoId);
+        fetchRecommendations("", currentSong.videoId, currentSong.artist, currentSong.title);
       } else if (query) {
         performSearch(query);
       }
