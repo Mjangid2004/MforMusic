@@ -8,10 +8,11 @@ function LocalAudioPlayer() {
   const { state, dispatch } = usePlayer();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentSong = state.queue[state.currentIndex];
-  const isLocal = currentSong?.isLocal || currentSong?.localUrl;
+  const isLocal = currentSong?.isLocal && currentSong?.localUrl;
+  const hasValidUrl = isLocal && currentSong.localUrl && currentSong.localUrl.startsWith("blob:");
 
   useEffect(() => {
-    if (!audioRef.current || !currentSong || !isLocal) return;
+    if (!hasValidUrl || !audioRef.current) return;
     try {
       if (state.isPlaying) {
         audioRef.current.play().catch(() => {});
@@ -19,16 +20,16 @@ function LocalAudioPlayer() {
         audioRef.current.pause();
       }
     } catch (e) {}
-  }, [state.isPlaying, currentSong?.id]);
+  }, [state.isPlaying, currentSong?.id, hasValidUrl]);
 
   useEffect(() => {
-    if (!audioRef.current || !currentSong || !isLocal) return;
+    if (!hasValidUrl || !audioRef.current) return;
     try {
       audioRef.current.volume = state.volume;
     } catch (e) {}
-  }, [state.volume, currentSong?.id]);
+  }, [state.volume, currentSong?.id, hasValidUrl]);
 
-  if (!isLocal || !currentSong?.localUrl) return null;
+  if (!hasValidUrl) return null;
 
   return (
     <audio
