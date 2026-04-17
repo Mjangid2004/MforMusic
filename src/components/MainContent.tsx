@@ -321,9 +321,20 @@ export default function MainContent() {
           </div>
         ) : selectedGenre ? (
           <div className="space-y-4">
-            <button onClick={() => setSelectedGenre(null)} className="text-sm text-gray-400 hover:text-white">
-              ← Back
-            </button>
+            <div className="flex items-center justify-between">
+              <button onClick={() => setSelectedGenre(null)} className="text-sm text-gray-400 hover:text-white">
+                ← Back
+              </button>
+              <button 
+                onClick={() => {
+                  setGenreSongs([]);
+                  handleLoadGenre(selectedGenre);
+                }} 
+                className="text-sm text-indigo-400 hover:text-indigo-300"
+              >
+                🔄 Refresh
+              </button>
+            </div>
             <h2 className="text-xl md:text-2xl font-bold">{selectedGenre.name}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
               {genreSongs.slice(0, 10).map((song, index) => (

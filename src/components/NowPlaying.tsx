@@ -139,46 +139,48 @@ export default function NowPlaying() {
         </div>
 
         <div className="w-64 flex items-center justify-end gap-2">
-          <button onClick={() => setShowPlaylistMenu(!showPlaylistMenu)} className="p-2 hover:bg-white/10 rounded-full text-indigo-400" title="Add to playlist">
-            <Plus className="w-5 h-5" />
-          </button>
-          {showPlaylistMenu && (
-            <div className="absolute bottom-full mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[200]">
-              <div className="p-2 border-b border-white/10">
-                <button onClick={() => setShowCreatePlaylist(true)} className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  Create new playlist
-                </button>
-              </div>
-              {state.playlists.length > 0 && (
-                <div className="max-h-48 overflow-y-auto">
-                  {state.playlists.map((playlist) => (
-                    <button key={playlist.id} onClick={() => handleAddToPlaylist(playlist.id)} className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 flex items-center justify-between">
-                      <span className="truncate">{playlist.name}</span>
-                      <span className="text-xs text-gray-500">{playlist.songs.length}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {state.localSongs.length > 0 && (
-                <div className="border-t border-white/10 p-2">
-                  <button onClick={() => handlePlayPlaylist(state.localSongs)} className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2">
-                    <Play className="w-4 h-4" />
-                    Play local songs ({state.localSongs.length})
+          <div className="relative">
+            <button onClick={() => setShowPlaylistMenu(!showPlaylistMenu)} className="p-2 hover:bg-white/10 rounded-full text-indigo-400" title="Add to playlist">
+              <Plus className="w-5 h-5" />
+            </button>
+            {showPlaylistMenu && (
+              <div className="absolute right-0 bottom-full mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[200]">
+                <div className="p-2 border-b border-white/10">
+                  <button onClick={() => setShowCreatePlaylist(true)} className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Create new playlist
                   </button>
                 </div>
-              )}
-            </div>
-          )}
-          {showCreatePlaylist && (
-            <div className="absolute bottom-full mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 p-3 z-[200]">
-              <input type="text" value={newPlaylistName} onChange={(e) => setNewPlaylistName(e.target.value)} placeholder="Playlist name..." className="w-full px-3 py-2 bg-white/10 rounded-lg text-sm mb-2" autoFocus />
-              <div className="flex gap-2">
-                <button onClick={handleCreateAndAdd} className="flex-1 py-2 bg-indigo-600 rounded-lg text-sm">Create</button>
-                <button onClick={() => setShowCreatePlaylist(false)} className="px-3 py-2 bg-white/10 rounded-lg text-sm">Cancel</button>
+                {state.playlists.length > 0 && (
+                  <div className="max-h-48 overflow-y-auto">
+                    {state.playlists.map((playlist) => (
+                      <button key={playlist.id} onClick={() => handleAddToPlaylist(playlist.id)} className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 flex items-center justify-between">
+                        <span className="truncate">{playlist.name}</span>
+                        <span className="text-xs text-gray-500">{playlist.songs.length}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {state.localSongs.length > 0 && (
+                  <div className="border-t border-white/10 p-2">
+                    <button onClick={() => handlePlayPlaylist(state.localSongs)} className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2">
+                      <Play className="w-4 h-4" />
+                      Play local songs ({state.localSongs.length})
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            )}
+            {showCreatePlaylist && (
+              <div className="absolute right-0 bottom-full mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 p-3 z-[200]">
+                <input type="text" value={newPlaylistName} onChange={(e) => setNewPlaylistName(e.target.value)} placeholder="Playlist name..." className="w-full px-3 py-2 bg-white/10 rounded-lg text-sm mb-2" autoFocus />
+                <div className="flex gap-2">
+                  <button onClick={handleCreateAndAdd} className="flex-1 py-2 bg-indigo-600 rounded-lg text-sm">Create</button>
+                  <button onClick={() => setShowCreatePlaylist(false)} className="px-3 py-2 bg-white/10 rounded-lg text-sm">Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
           <button onClick={() => currentSong && toggleFavorite(currentSong)} className="p-2 hover:bg-white/10 rounded-full">
             <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
           </button>
