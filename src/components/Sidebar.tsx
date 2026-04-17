@@ -7,10 +7,15 @@ import { useState } from "react";
 
 export default function Sidebar() {
   const { state } = usePlayer();
-  const { viewMode, setViewMode } = useAppContext();
+  const { viewMode, setViewMode, clearSearch } = useAppContext();
   const [showInstallHelp, setShowInstallHelp] = useState(false);
 
   const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  const handleTabClick = (mode: any) => {
+    clearSearch();
+    setViewMode(mode);
+  };
 
   const handleInstall = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,7 +59,7 @@ export default function Sidebar() {
 
         <div className="flex flex-col gap-2 mb-6">
           <button
-            onClick={() => setViewMode('home')}
+            onClick={() => handleTabClick('home')}
             className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'home' ? 'bg-white/10' : 'hover:bg-white/5'}`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,7 +68,7 @@ export default function Sidebar() {
             <span>Home</span>
           </button>
           <button
-            onClick={() => setViewMode('queue')}
+            onClick={() => handleTabClick('queue')}
             className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'queue' ? 'bg-white/10' : 'hover:bg-white/5'}`}
           >
             <ListMusic className={`w-5 h-5 ${viewMode === 'queue' ? 'text-indigo-400' : 'text-gray-400'}`} />
@@ -71,7 +76,7 @@ export default function Sidebar() {
             <span className="ml-auto text-xs text-gray-400">{state.queue.length}</span>
           </button>
           <button
-            onClick={() => setViewMode('liked')}
+            onClick={() => handleTabClick('liked')}
             className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'liked' ? 'bg-white/10' : 'hover:bg-white/5'}`}
           >
             <Heart className={`w-5 h-5 ${viewMode === 'liked' ? 'text-pink-500' : 'text-gray-400'}`} />
@@ -79,14 +84,14 @@ export default function Sidebar() {
             <span className="ml-auto text-xs text-gray-400">{state.favorites.length}</span>
           </button>
           <button
-            onClick={() => setViewMode('history')}
+            onClick={() => handleTabClick('history')}
             className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'history' ? 'bg-white/10' : 'hover:bg-white/5'}`}
           >
             <Clock className={`w-5 h-5 ${viewMode === 'history' ? 'text-blue-500' : 'text-gray-400'}`} />
             <span>History</span>
           </button>
           <button
-            onClick={() => setViewMode('local')}
+            onClick={() => handleTabClick('local')}
             className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'local' ? 'bg-white/10' : 'hover:bg-white/5'}`}
           >
             <Folder className={`w-5 h-5 ${viewMode === 'local' ? 'text-green-500' : 'text-gray-400'}`} />
@@ -94,7 +99,7 @@ export default function Sidebar() {
             <span className="ml-auto text-xs text-gray-400">{state.localSongs.length}</span>
           </button>
           <button
-            onClick={() => setViewMode('playlists')}
+            onClick={() => handleTabClick('playlists')}
             className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors ${viewMode === 'playlists' ? 'bg-white/10' : 'hover:bg-white/5'}`}
           >
             <PlusSquare className={`w-5 h-5 ${viewMode === 'playlists' ? 'text-orange-500' : 'text-gray-400'}`} />

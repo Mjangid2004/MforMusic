@@ -196,7 +196,7 @@ export default function NowPlaying() {
             </button>
             
             {showPlaylistMenu && (
-              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden">
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[100]">
                 <div className="p-2 border-b border-white/10">
                   <button
                     onClick={() => setShowCreatePlaylist(true)}
@@ -308,7 +308,7 @@ export default function NowPlaying() {
             </button>
             
             {showPlaylistMenu && (
-              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden">
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[100]">
                 <div className="p-2 border-b border-white/10">
                   <button
                     onClick={() => setShowCreatePlaylist(true)}
