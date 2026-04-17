@@ -13,17 +13,17 @@ export default function LocalSongs() {
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
     const newSongs = Array.from(files).map((file, index) => {
       const objectUrl = URL.createObjectURL(file);
       const nameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
       
       return {
-        id: `local-${Date.now()}-${index}`,
+        id: `local-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
         title: nameWithoutExtension,
         artist: "Local File",
-        thumbnail: "https://img.youtube.com/vi/hashed/mqdefault.jpg".replace("hashed", Date.now().toString(36)),
+        thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%236366f1' width='100' height='100'/%3E%3Ccircle cx='50' cy='50' r='25' fill='%23ffffff'/%3E%3C/svg%3E",
         duration: 0,
         videoId: objectUrl,
         isLocal: true,

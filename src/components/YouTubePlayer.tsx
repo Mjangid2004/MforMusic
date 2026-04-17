@@ -12,18 +12,21 @@ function LocalAudioPlayer() {
 
   useEffect(() => {
     if (!audioRef.current || !currentSong || !isLocal) return;
-
-    if (state.isPlaying) {
-      audioRef.current.play().catch(() => {});
-    } else {
-      audioRef.current.pause();
-    }
-  }, [state.isPlaying, currentSong, isLocal]);
+    try {
+      if (state.isPlaying) {
+        audioRef.current.play().catch(() => {});
+      } else {
+        audioRef.current.pause();
+      }
+    } catch (e) {}
+  }, [state.isPlaying, currentSong?.id]);
 
   useEffect(() => {
     if (!audioRef.current || !currentSong || !isLocal) return;
-    audioRef.current.volume = state.volume;
-  }, [state.volume, currentSong, isLocal]);
+    try {
+      audioRef.current.volume = state.volume;
+    } catch (e) {}
+  }, [state.volume, currentSong?.id]);
 
   if (!isLocal || !currentSong?.localUrl) return null;
 
@@ -31,12 +34,23 @@ function LocalAudioPlayer() {
     <audio
       ref={audioRef}
       src={currentSong.localUrl}
-      onEnded={() => dispatch({ type: "NEXT_SONG" })}
+      onEnded={() => {
+        try {
+          dispatch({ type: "NEXT_SONG" });
+        } catch (e) {}
+      }}
       onTimeUpdate={() => {
-        if (audioRef.current) {
-          dispatch({ type: "SET_CURRENT_TIME", payload: audioRef.current.currentTime });
-          dispatch({ type: "SET_DURATION", payload: audioRef.current.duration || 0 });
-        }
+        try {
+          if (audioRef.current) {
+            dispatch({ type: "SET_CURRENT_TIME", payload: audioRef.current.currentTime });
+            dispatch({ type: "SET_DURATION", payload: audioRef.current.duration || 0 });
+          }
+        } catch (e) {}
+      }}
+      onError={() => {
+        try {
+          dispatch({ type: "NEXT_SONG" });
+        } catch (e) {}
       }}
       autoPlay
     />
