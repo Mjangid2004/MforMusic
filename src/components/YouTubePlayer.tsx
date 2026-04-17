@@ -165,9 +165,7 @@ export default function YouTubePlayer() {
 
   if (!currentSong) return null;
 
-  if (isLocal) {
-    return <LocalAudioPlayer />;
-  }
+  if (isLocal) return <LocalAudioPlayer />;
 
   return (
     <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
