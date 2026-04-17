@@ -184,9 +184,9 @@ export default function NowPlaying() {
           <div className="w-full mt-2">
             <ProgressBar />
           </div>
-        </div>
+</div>
 
-<div className="w-64 flex items-center justify-end gap-2">
+        <div className="w-64 flex items-center justify-end gap-2">
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
@@ -207,6 +207,34 @@ export default function NowPlaying() {
                     Create new playlist
                   </button>
                 </div>
+                {state.playlists.length > 0 && (
+                  <div className="max-h-48 overflow-y-auto">
+                    {state.playlists.map((playlist) => (
+                      <button
+                        key={playlist.id}
+                        onClick={() => handleAddToPlaylist(playlist.id)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 flex items-center justify-between"
+                      >
+                        <span className="truncate">{playlist.name}</span>
+                        <span className="text-xs text-gray-500">{playlist.songs.length}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {state.localSongs.length > 0 && (
+                  <div className="border-t border-white/10 p-2">
+                    <button
+                      onClick={() => handlePlayPlaylist(state.localSongs)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2"
+                    >
+                      <Play className="w-4 h-4" />
+                      Play local songs ({state.localSongs.length})
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
                 {state.playlists.length > 0 && (
                   <div className="max-h-48 overflow-y-auto">
                     {state.playlists.map((playlist) => (
@@ -300,16 +328,16 @@ export default function NowPlaying() {
             <Controls />
           </div>
 
-          <div className="relative">
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
-              className="p-2 hover:bg-white/10 rounded-full flex-shrink-0"
+              className="p-2 hover:bg-white/10 rounded-full flex-shrink-0 text-indigo-400"
             >
               <Plus className="w-5 h-5" />
             </button>
             
             {showPlaylistMenu && (
-              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[100]">
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[200]">
                 <div className="p-2 border-b border-white/10">
                   <button
                     onClick={() => setShowCreatePlaylist(true)}
