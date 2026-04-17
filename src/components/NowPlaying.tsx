@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import ProgressBar from "@/components/ProgressBar";
 import Controls from "@/components/Controls";
 import VolumeControl from "@/components/VolumeControl";
 import YouTubePlayer from "@/components/YouTubePlayer";
-import { X, Music2, Heart } from "lucide-react";
+import { X, Music2, Heart, Plus, ListPlus, Play } from "lucide-react";
 
 const MOCK_LYRICS: { [key: string]: string } = {
   default: `♪ ♫ ♪
@@ -20,13 +20,43 @@ when available for this song.
 };
 
 export default function NowPlaying() {
-  const { state, toggleFavorite, isFavorite } = usePlayer();
+  const { state, toggleFavorite, isFavorite, dispatch, createPlaylist, addToPlaylist } = usePlayer();
   const [showPlayer, setShowPlayer] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
+  const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
+  const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
   const currentSong = state.queue[state.currentIndex];
 
   const lyrics = currentSong ? (MOCK_LYRICS[currentSong.id] || MOCK_LYRICS.default) : MOCK_LYRICS.default;
   const liked = currentSong ? isFavorite(currentSong) : false;
+
+  const handleAddToPlaylist = (playlistId: string) => {
+    if (currentSong) {
+      addToPlaylist(playlistId, currentSong);
+      setShowPlaylistMenu(false);
+    }
+  };
+
+  const handleCreateAndAdd = () => {
+    if (newPlaylistName.trim() && currentSong) {
+      const playlistId = Date.now().toString();
+      dispatch({ 
+        type: "CREATE_PLAYLIST", 
+        payload: { name: newPlaylistName.trim(), songs: [currentSong] } 
+      });
+      setNewPlaylistName("");
+      setShowCreatePlaylist(false);
+      setShowPlaylistMenu(false);
+    }
+  };
+
+  const handlePlayPlaylist = (songs: any[], index: number = 0) => {
+    if (songs.length > 0) {
+      dispatch({ type: "SET_QUEUE", payload: songs });
+      dispatch({ type: "PLAY_SONG", payload: { song: songs[index], queue: songs } });
+    }
+  };
 
   return (
     <>
@@ -156,7 +186,81 @@ export default function NowPlaying() {
           </div>
         </div>
 
-        <div className="w-64 flex items-center justify-end gap-4">
+        <div className="w-64 flex items-center justify-end gap-2">
+          <div className="relative">
+            <button
+              onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
+              className="p-2 hover:bg-white/10 rounded-full"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+            
+            {showPlaylistMenu && (
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden">
+                <div className="p-2 border-b border-white/10">
+                  <button
+                    onClick={() => setShowCreatePlaylist(true)}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create new playlist
+                  </button>
+                </div>
+                {state.playlists.length > 0 && (
+                  <div className="max-h-48 overflow-y-auto">
+                    {state.playlists.map((playlist) => (
+                      <button
+                        key={playlist.id}
+                        onClick={() => handleAddToPlaylist(playlist.id)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 flex items-center justify-between"
+                      >
+                        <span className="truncate">{playlist.name}</span>
+                        <span className="text-xs text-gray-500">{playlist.songs.length}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {state.localSongs.length > 0 && (
+                  <div className="border-t border-white/10 p-2">
+                    <button
+                      onClick={() => handlePlayPlaylist(state.localSongs)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2"
+                    >
+                      <Play className="w-4 h-4" />
+                      Play local songs ({state.localSongs.length})
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {showCreatePlaylist && (
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 p-3">
+                <input
+                  type="text"
+                  value={newPlaylistName}
+                  onChange={(e) => setNewPlaylistName(e.target.value)}
+                  placeholder="Playlist name..."
+                  className="w-full px-3 py-2 bg-white/10 rounded-lg text-sm mb-2"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCreateAndAdd}
+                    className="flex-1 py-2 bg-indigo-600 rounded-lg text-sm"
+                  >
+                    Create
+                  </button>
+                  <button
+                    onClick={() => setShowCreatePlaylist(false)}
+                    className="px-3 py-2 bg-white/10 rounded-lg text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <button
             onClick={() => currentSong && toggleFavorite(currentSong)}
             className="p-2 hover:bg-white/10 rounded-full"
@@ -193,6 +297,54 @@ export default function NowPlaying() {
 
           <div className="flex-1 flex justify-center">
             <Controls />
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
+              className="p-2 hover:bg-white/10 rounded-full flex-shrink-0"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+            
+            {showPlaylistMenu && (
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden">
+                <div className="p-2 border-b border-white/10">
+                  <button
+                    onClick={() => setShowCreatePlaylist(true)}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create new playlist
+                  </button>
+                </div>
+                {state.playlists.length > 0 && (
+                  <div className="max-h-48 overflow-y-auto">
+                    {state.playlists.map((playlist) => (
+                      <button
+                        key={playlist.id}
+                        onClick={() => handleAddToPlaylist(playlist.id)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 flex items-center justify-between"
+                      >
+                        <span className="truncate">{playlist.name}</span>
+                        <span className="text-xs text-gray-500">{playlist.songs.length}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {state.localSongs.length > 0 && (
+                  <div className="border-t border-white/10 p-2">
+                    <button
+                      onClick={() => handlePlayPlaylist(state.localSongs)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded flex items-center gap-2"
+                    >
+                      <Play className="w-4 h-4" />
+                      Play local songs ({state.localSongs.length})
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <button
