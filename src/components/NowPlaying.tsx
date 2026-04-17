@@ -186,17 +186,18 @@ export default function NowPlaying() {
           </div>
         </div>
 
-        <div className="w-64 flex items-center justify-end gap-2">
-          <div className="relative">
+<div className="w-64 flex items-center justify-end gap-2">
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
               className="p-2 hover:bg-white/10 rounded-full"
+              title="Add to playlist"
             >
               <Plus className="w-5 h-5" />
             </button>
             
             {showPlaylistMenu && (
-              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[100]">
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[200]">
                 <div className="p-2 border-b border-white/10">
                   <button
                     onClick={() => setShowCreatePlaylist(true)}
@@ -235,7 +236,7 @@ export default function NowPlaying() {
             )}
             
             {showCreatePlaylist && (
-              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 p-3">
+              <div className="absolute bottom-full right-0 mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 p-3 z-[200]">
                 <input
                   type="text"
                   value={newPlaylistName}
