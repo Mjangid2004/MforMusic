@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from "react";
-import { Song, PlayMode, Theme, Tab } from "@/lib/types";
+import { Song, PlayMode, Theme, Tab, Playlist } from "@/lib/types";
 
 type Action =
   | { type: "SET_QUEUE"; payload: Song[] }
@@ -23,13 +23,22 @@ type Action =
   | { type: "SET_DYNAMIC_COLORS"; payload: [string, string] }
   | { type: "CLEAR_HISTORY" }
   | { type: "ADD_TO_HISTORY"; payload: Song }
-  | { type: "LOAD_SAVED_DATA"; payload: { favorites: Song[]; history: Song[]; queue: Song[]; currentIndex: number; volume: number; theme: Theme } };
+  | { type: "LOAD_SAVED_DATA"; payload: { favorites: Song[]; history: Song[]; queue: Song[]; currentIndex: number; volume: number; theme: Theme } }
+  | { type: "ADD_LOCAL_SONGS"; payload: Song[] }
+  | { type: "REMOVE_LOCAL_SONG"; payload: string }
+  | { type: "CREATE_PLAYLIST"; payload: { name: string; songs?: Song[] } }
+  | { type: "DELETE_PLAYLIST"; payload: string }
+  | { type: "ADD_TO_PLAYLIST"; payload: { playlistId: string; song: Song } }
+  | { type: "REMOVE_FROM_PLAYLIST"; payload: { playlistId: string; songId: string } }
+  | { type: "LOAD_SAVED_PLAYLISTS"; payload: Playlist[] };
 
 interface PlayerState {
   queue: Song[];
   currentIndex: number;
   history: Song[];
   favorites: Song[];
+  localSongs: Song[];
+  playlists: Playlist[];
   playMode: PlayMode;
   repeatCount: number;
   volume: number;
@@ -50,6 +59,8 @@ const initialState: PlayerState = {
   currentIndex: -1,
   history: [],
   favorites: [],
+  localSongs: [],
+  playlists: [],
   playMode: "order",
   repeatCount: 0,
   volume: 0.7,
@@ -150,6 +161,42 @@ function reducer(state: PlayerState, action: Action): PlayerState {
         theme: action.payload.theme ?? "dark",
       };
     }
+    case "ADD_LOCAL_SONGS":
+      return { ...state, localSongs: [...state.localSongs, ...action.payload] };
+    case "REMOVE_LOCAL_SONG":
+      return { ...state, localSongs: state.localSongs.filter(s => s.id !== action.payload) };
+    case "CREATE_PLAYLIST": {
+      const newPlaylist: Playlist = {
+        id: Date.now().toString(),
+        name: action.payload.name,
+        songs: action.payload.songs || [],
+      };
+      return { ...state, playlists: [...state.playlists, newPlaylist] };
+    }
+    case "DELETE_PLAYLIST":
+      return { ...state, playlists: state.playlists.filter(p => p.id !== action.payload) };
+    case "ADD_TO_PLAYLIST": {
+      return {
+        ...state,
+        playlists: state.playlists.map(p =>
+          p.id === action.payload.playlistId
+            ? { ...p, songs: [...p.songs, action.payload.song] }
+            : p
+        ),
+      };
+    }
+    case "REMOVE_FROM_PLAYLIST": {
+      return {
+        ...state,
+        playlists: state.playlists.map(p =>
+          p.id === action.payload.playlistId
+            ? { ...p, songs: p.songs.filter(s => s.id !== action.payload.songId) }
+            : p
+        ),
+      };
+    }
+    case "LOAD_SAVED_PLAYLISTS":
+      return { ...state, playlists: action.payload };
     default:
       return state;
   }
@@ -167,6 +214,10 @@ interface PlayerContextType {
   isFavorite: (song: Song) => boolean;
   getTopPlayed: () => Song[];
   setCurrentTab: (tab: Tab) => void;
+  addLocalSongs: (songs: Song[]) => void;
+  addToPlaylist: (playlistId: string, song: Song) => void;
+  createPlaylist: (name: string, songs?: Song[]) => void;
+  deletePlaylist: (id: string) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | null>(null);
@@ -244,6 +295,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("playCount", JSON.stringify(playCountRef.current));
   }, [state.currentIndex]);
 
+  useEffect(() => {
+    if (!initialized.current) return;
+    localStorage.setItem("localSongs", JSON.stringify(state.localSongs));
+  }, [state.localSongs]);
+
+  useEffect(() => {
+    if (!initialized.current) return;
+    localStorage.setItem("playlists", JSON.stringify(state.playlists));
+  }, [state.playlists]);
+
   const playSong = useCallback((song: Song, queue?: Song[]) => {
     dispatch({ type: "PLAY_SONG", payload: { song, queue } });
     dispatch({ type: "ADD_TO_HISTORY", payload: song });
@@ -259,18 +320,47 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "TOGGLE_PLAY" });
   }, []);
 
-  const nextSong = useCallback(() => {
+  const nextSong = useCallback(async () => {
     if (state.queue.length === 0) return;
-    const nextIndex = (state.currentIndex + 1) % state.queue.length;
-    const nextSongToPlay = state.queue[nextIndex];
     
-    if (!nextSongToPlay || !nextSongToPlay.videoId) return;
+    let nextIndex = state.currentIndex + 1;
     
-    if (nextIndex === 0 && state.playMode !== "repeat-all") {
-      dispatch({ type: "TOGGLE_PLAY" });
-      return;
+    if (nextIndex >= state.queue.length) {
+      if (state.playMode === "repeat-all") {
+        nextIndex = 0;
+      } else {
+        const currentSong = state.queue[state.currentIndex];
+        if (currentSong?.videoId) {
+          try {
+            const response = await fetch(`/api/search?videoId=${encodeURIComponent(currentSong.videoId)}&related=true`);
+            const data = await response.json();
+            if (data.results && Array.isArray(data.results)) {
+              const relatedSongs = data.results;
+              for (const song of relatedSongs) {
+                dispatch({ type: "ADD_TO_QUEUE", payload: song });
+              }
+              nextIndex = state.queue.length;
+            } else {
+              dispatch({ type: "TOGGLE_PLAY" });
+              return;
+            }
+          } catch (error) {
+            console.error("Failed to fetch related songs:", error);
+            dispatch({ type: "TOGGLE_PLAY" });
+            return;
+          }
+        } else {
+          dispatch({ type: "TOGGLE_PLAY" });
+          return;
+        }
+      }
     }
-    playSong(nextSongToPlay);
+    
+    const nextSongToPlay = state.queue[nextIndex];
+    if (nextSongToPlay?.videoId) {
+      dispatch({ type: "NEXT_SONG" });
+      playSong(nextSongToPlay);
+    }
   }, [state.queue, state.currentIndex, state.playMode, playSong]);
 
   const prevSong = useCallback(() => {
@@ -309,6 +399,22 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "SET_TAB", payload: tab });
   }, [dispatch]);
 
+  const addLocalSongs = useCallback((songs: Song[]) => {
+    dispatch({ type: "ADD_LOCAL_SONGS", payload: songs });
+  }, []);
+
+  const addToPlaylist = useCallback((playlistId: string, song: Song) => {
+    dispatch({ type: "ADD_TO_PLAYLIST", payload: { playlistId, song } });
+  }, []);
+
+  const createPlaylist = useCallback((name: string, songs?: Song[]) => {
+    dispatch({ type: "CREATE_PLAYLIST", payload: { name, songs } });
+  }, []);
+
+  const deletePlaylist = useCallback((id: string) => {
+    dispatch({ type: "DELETE_PLAYLIST", payload: id });
+  }, []);
+
   return (
     <PlayerContext.Provider
       value={{
@@ -323,6 +429,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         isFavorite,
         getTopPlayed,
         setCurrentTab,
+        addLocalSongs,
+        addToPlaylist,
+        createPlaylist,
+        deletePlaylist,
       }}
     >
       {children}

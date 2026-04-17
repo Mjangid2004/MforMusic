@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppContext } from "@/context/AppContext";
-import { Home, Heart, Clock, ListMusic, Download } from "lucide-react";
+import { Home, Heart, Clock, ListMusic, Download, Folder, PlusSquare } from "lucide-react";
 import { useState } from "react";
 
 export default function BottomNav() {
@@ -20,6 +20,7 @@ export default function BottomNav() {
     { id: "queue" as const, label: "Queue", icon: <ListMusic className="w-6 h-6" /> },
     { id: "liked" as const, label: "Liked", icon: <Heart className="w-6 h-6" /> },
     { id: "history" as const, label: "History", icon: <Clock className="w-6 h-6" /> },
+    { id: "local" as const, label: "Local", icon: <Folder className="w-6 h-6" /> },
   ];
 
   const handleTabClick = (tabId: typeof tabs[0]['id']) => {

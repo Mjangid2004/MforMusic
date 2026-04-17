@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAppContext } from "@/context/AppContext";
 import { Song } from "@/lib/types";
+import LocalSongs from "./LocalSongs";
 
 const GENRES = [
   { name: "Haryanvi", query: "haryanvi song official video 2024", color: "from-orange-500 to-red-500" },
@@ -312,6 +313,39 @@ export default function MainContent() {
                   ))}
                 </div>
               </>
+            )}
+          </div>
+        ) : viewMode === 'local' ? (
+          <LocalSongs />
+        ) : viewMode === 'playlists' ? (
+          <div className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-bold">Playlists</h2>
+            {state.playlists.length === 0 ? (
+              <p className="text-gray-400 text-sm">No playlists yet. Create one from the Local Songs tab!</p>
+            ) : (
+              <div className="space-y-2">
+                {state.playlists.map((playlist) => (
+                  <div 
+                    key={`playlist-${playlist.id}`} 
+                    className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg cursor-pointer"
+                    onClick={() => {
+                      if (playlist.songs.length > 0) {
+                        playSong(playlist.songs[0], playlist.songs);
+                      }
+                    }}
+                  >
+                    <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{playlist.name}</p>
+                      <p className="text-sm text-gray-400">{playlist.songs.length} songs</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         ) : selectedGenre ? (

@@ -13,9 +13,15 @@ export default function SearchBar() {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const lastSearchRef = useRef<string>("");
 
-  const fetchRecommendations = useCallback(async (searchTerm: string) => {
+  const fetchRecommendations = useCallback(async (searchTerm: string, currentVideoId?: string) => {
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}`);
+      let url = `/api/search?q=${encodeURIComponent(searchTerm)}`;
+      
+      if (currentVideoId) {
+        url = `/api/search?videoId=${encodeURIComponent(currentVideoId)}&related=true`;
+      }
+      
+      const response = await fetch(url);
       const data = await response.json();
       
       if (data.results && Array.isArray(data.results)) {
@@ -63,7 +69,12 @@ export default function SearchBar() {
     }
 
     debounceRef.current = setTimeout(() => {
-      performSearch(query);
+      const currentSong = state.queue[state.currentIndex];
+      if (!query && currentSong?.videoId) {
+        fetchRecommendations("", currentSong.videoId);
+      } else if (query) {
+        performSearch(query);
+      }
     }, 800);
 
     return () => {
@@ -71,7 +82,7 @@ export default function SearchBar() {
         clearTimeout(debounceRef.current);
       }
     };
-  }, [query, performSearch]);
+  }, [query, performSearch, fetchRecommendations, state.queue, state.currentIndex]);
 
   const handlePlayRecommendation = (song: Song) => {
     playSong(song, recommendations);
@@ -140,7 +151,11 @@ export default function SearchBar() {
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm text-indigo-400 px-1">
             <Sparkles className="w-4 h-4" />
-            <span>Recommended for "{lastSearchRef.current}"</span>
+            <span>
+              {!query && state.queue[state.currentIndex]?.videoId
+                ? `Related to "${state.queue[state.currentIndex]?.title}"`
+                : `Recommended for "${lastSearchRef.current}"`}
+            </span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {recommendations.map((song) => (

@@ -6,6 +6,12 @@ const CORS_PROXY = "https://api.codetabs.com/v1/proxy";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get("q");
+  const videoId = searchParams.get("videoId");
+  const related = searchParams.get("related");
+
+  if (related === "true" && videoId) {
+    return getRelatedSongs(videoId);
+  }
 
   if (!query) {
     return NextResponse.json({ results: [] });
@@ -104,4 +110,105 @@ function parseDuration(duration: string): number {
   if (parts.length === 2) return parts[0] * 60 + parts[1];
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
   return 0;
+}
+
+async function getRelatedSongs(videoId: string) {
+  try {
+    const searchUrl = `https://www.youtube.com/watch?v=${videoId}&pbj=1`;
+    
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(`${CORS_PROXY}?quest=${encodeURIComponent(searchUrl)}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      return NextResponse.json({ results: [] });
+    }
+
+    const html = await response.text();
+    const results: Song[] = [];
+    
+    const relatedVideosMatch = html.match(/"related_VIDEO_DETAILS"\s*:\s*({.*?})/s);
+    
+    if (relatedVideosMatch) {
+      try {
+        const data = JSON.parse(relatedVideosMatch[1]);
+        const videos = data?.relatedVideoDetails;
+
+        if (videos && Array.isArray(videos)) {
+          for (const video of videos.slice(0, 15)) {
+            if (video?.videoId && video?.title) {
+              results.push({
+                id: video.videoId,
+                title: video.title,
+                artist: video.channelTitle || "YouTube",
+                thumbnail: `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`,
+                duration: video.lengthSeconds || 0,
+                videoId: video.videoId,
+              });
+            }
+          }
+        }
+      } catch (parseError) {
+        console.error("Parse related error:", parseError);
+      }
+    }
+
+    if (results.length === 0) {
+      const relatedUrl = `https://www.youtube.com/results?search_query=related:${videoId}`;
+      const relatedResponse = await fetch(`${CORS_PROXY}?quest=${encodeURIComponent(relatedUrl)}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+      });
+      const relatedHtml = await relatedResponse.text();
+      
+      const ytInitialDataMatch = relatedHtml.match(/ytInitialData\s*=\s*({.*?});/s);
+      
+      if (ytInitialDataMatch) {
+        try {
+          const data = JSON.parse(ytInitialDataMatch[1]);
+          const videos = data?.contents?.twoColumnSearchResultsRenderer?.primary_contents?.sectionListRenderer?.contents;
+          
+          if (videos && Array.isArray(videos)) {
+            for (const section of videos) {
+              const items = section?.itemSectionRenderer?.contents;
+              if (items && Array.isArray(items)) {
+                for (const item of items.slice(0, 15)) {
+                  const video = item?.videoRenderer;
+                  if (video?.videoId && video?.title?.runs?.[0]?.text) {
+                    const vid = video.videoId;
+                    if (vid !== videoId) {
+                      results.push({
+                        id: vid,
+                        title: video.title.runs[0].text,
+                        artist: video.ownerText?.runs?.[0]?.text || "YouTube",
+                        thumbnail: `https://img.youtube.com/vi/${vid}/mqdefault.jpg`,
+                        duration: parseDuration(video.lengthText?.simpleText || "0:00"),
+                        videoId: vid,
+                      });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (parseError) {
+          console.error("Parse related fallback error:", parseError);
+        }
+      }
+    }
+
+    return NextResponse.json({ results: results.slice(0, 10) });
+  } catch (error) {
+    console.error("Related songs error:", error);
+    return NextResponse.json({ results: [], error: "Failed to get related songs" });
+  }
 }

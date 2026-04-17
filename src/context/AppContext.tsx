@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export type ViewMode = 'home' | 'liked' | 'history' | 'queue';
+export type ViewMode = 'home' | 'liked' | 'history' | 'queue' | 'local' | 'playlists';
 
 interface AppContextType {
   viewMode: ViewMode;

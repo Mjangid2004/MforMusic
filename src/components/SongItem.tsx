@@ -1,7 +1,7 @@
 "use client";
 
 import { usePlayer } from "@/context/PlayerContext";
-import { Heart, Play, Pause } from "lucide-react";
+import { Heart, Play, Pause, ListPlus } from "lucide-react";
 import Image from "next/image";
 import { Song } from "@/lib/types";
 
@@ -9,10 +9,11 @@ interface SongItemProps {
   song: Song;
   isPlaying?: boolean;
   showFavorite?: boolean;
+  showAddToQueue?: boolean;
 }
 
-export default function SongItem({ song, isPlaying, showFavorite = true }: SongItemProps) {
-  const { playSong, togglePlay, toggleFavorite, isFavorite, state } = usePlayer();
+export default function SongItem({ song, isPlaying, showFavorite = true, showAddToQueue = true }: SongItemProps) {
+  const { playSong, togglePlay, toggleFavorite, isFavorite, state, dispatch } = usePlayer();
 
   const isCurrentSong = state.queue[state.currentIndex]?.id === song.id;
   const isThisPlaying = isCurrentSong && state.isPlaying;
@@ -29,6 +30,11 @@ export default function SongItem({ song, isPlaying, showFavorite = true }: SongI
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(song);
+  };
+
+  const handleAddToQueue = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch({ type: "ADD_TO_QUEUE", payload: song });
   };
 
   const formatDuration = (seconds: number) => {
@@ -81,6 +87,15 @@ export default function SongItem({ song, isPlaying, showFavorite = true }: SongI
 
       <div className="flex items-center gap-3">
         <span className="text-xs text-gray-500">{formatDuration(song.duration)}</span>
+        {showAddToQueue && (
+          <button
+            onClick={handleAddToQueue}
+            className="p-2 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-indigo-400 transition-all"
+            title="Add to queue"
+          >
+            <ListPlus className="w-4 h-4" />
+          </button>
+        )}
         {showFavorite && (
           <button
             onClick={handleFavorite}

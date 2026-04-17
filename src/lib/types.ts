@@ -6,11 +6,19 @@ export interface Song {
   duration: number;
   videoId: string;
   isLocal?: boolean;
+  localUrl?: string;
 }
 
 export type PlayMode = "order" | "once" | "repeat2" | "repeat-all" | "shuffle";
 export type Theme = "light" | "dark" | "dynamic";
-export type Tab = "search" | "favorites" | "history" | "top";
+export type Tab = "search" | "favorites" | "history" | "top" | "local" | "playlists";
+
+export interface Playlist {
+  id: string;
+  name: string;
+  songs: Song[];
+  coverImage?: string;
+}
 
 export interface PlayerState {
   queue: Song[];
