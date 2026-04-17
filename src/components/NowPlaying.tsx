@@ -13,7 +13,7 @@ const MOCK_LYRICS: { [key: string]: string } = {
 };
 
 export default function NowPlaying() {
-  const { state, toggleFavorite, isFavorite, dispatch, addToPlaylist } = usePlayer();
+  const { state, toggleFavorite, isFavorite, dispatch, addToPlaylist, createPlaylist } = usePlayer();
   const [showPlayer, setShowPlayer] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
@@ -31,11 +31,9 @@ export default function NowPlaying() {
   };
 
   const handleCreateAndAdd = () => {
-    if (newPlaylistName.trim() && currentSong) {
-      dispatch({
-        type: "CREATE_PLAYLIST",
-        payload: { name: newPlaylistName.trim(), songs: [currentSong] },
-      });
+    if (newPlaylistName.trim()) {
+      const songsToAdd = currentSong ? [currentSong] : [];
+      createPlaylist(newPlaylistName.trim(), songsToAdd);
       setNewPlaylistName("");
       setShowCreatePlaylist(false);
       setShowPlaylistMenu(false);

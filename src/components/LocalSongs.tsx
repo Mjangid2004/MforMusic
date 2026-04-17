@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { usePlayer } from "@/context/PlayerContext";
-import { Upload, Folder, Plus, Trash2, Play, X } from "lucide-react";
+import { Upload, Folder, Plus, Trash2, Play, X, ListPlus } from "lucide-react";
 import SongItem from "./SongItem";
 
 export default function LocalSongs() {
