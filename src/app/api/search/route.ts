@@ -170,24 +170,14 @@ async function getRelatedSongs(videoId: string, artistName?: string, songTitle?:
                   const channel = video.ownerText?.runs?.[0]?.text || "YouTube";
                   
                   if (vid !== currentVideoId) {
-                    const titleLower = title.toLowerCase();
-                    const artistLower = channel.toLowerCase();
-                    const currentTitleLower = (songTitle || "").toLowerCase();
-                    const currentArtistLower = (artistName || "").toLowerCase();
-                    
-                    const isDuplicate = titleLower.includes(currentTitleLower.split(" ")[0]) && 
-                                      (titleLower.includes(currentTitleLower.split(" ").slice(-1)[0] || titleLower.length < currentTitleLower.length + 10);
-                    
-                    if (!isDuplicate) {
-                      results.push({
-                        id: vid,
-                        title: title,
-                        artist: channel,
-                        thumbnail: `https://img.youtube.com/vi/${vid}/mqdefault.jpg`,
-                        duration: parseDuration(video.lengthText?.simpleText || "0:00"),
-                        videoId: vid,
-                      });
-                    }
+                    results.push({
+                      id: vid,
+                      title: title,
+                      artist: channel,
+                      thumbnail: `https://img.youtube.com/vi/${vid}/mqdefault.jpg`,
+                      duration: parseDuration(video.lengthText?.simpleText || "0:00"),
+                      videoId: vid,
+                    });
                   }
                 }
               }
