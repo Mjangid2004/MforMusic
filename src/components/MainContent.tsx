@@ -82,7 +82,11 @@ export default function MainContent() {
       const response = await fetch(`/api/search?q=${encodeURIComponent(genre.query)}`);
       const data = await response.json();
       if (data.results && Array.isArray(data.results)) {
-        setGenreSongs(data.results);
+        const filtered = data.results.filter((song: Song) => {
+          const duration = song.duration || 0;
+          return duration > 0 && duration <= 600;
+        });
+        setGenreSongs(filtered);
       }
     } catch (error) {
       console.error("Failed to load genre:", error);
