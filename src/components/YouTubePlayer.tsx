@@ -53,6 +53,7 @@ export default function YouTubePlayer() {
 
   if (isLocal) {
     return <LocalAudioPlayer />;
+  }
 
   const handleReady = useCallback((event: any) => {
     try {
