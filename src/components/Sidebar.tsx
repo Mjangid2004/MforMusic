@@ -2,18 +2,19 @@
 
 import { usePlayer } from "@/context/PlayerContext";
 import { useAppContext } from "@/context/AppContext";
-import { Music2, Heart, Clock, ListMusic, Download, Folder, PlusSquare } from "lucide-react";
+import { Music2, Heart, Clock, ListMusic, Download, Folder, PlusSquare, ListPlus } from "lucide-react";
 import { useState } from "react";
 
 export default function Sidebar() {
   const { state } = usePlayer();
-  const { viewMode, setViewMode, clearSearch } = useAppContext();
+  const { viewMode, setViewMode, clearSearch, setSearchQuery } = useAppContext();
   const [showInstallHelp, setShowInstallHelp] = useState(false);
 
   const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   const handleTabClick = (mode: any) => {
     clearSearch();
+    setSearchQuery('');
     setViewMode(mode);
   };
 

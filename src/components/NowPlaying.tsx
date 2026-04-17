@@ -190,7 +190,7 @@ export default function NowPlaying() {
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
-              className="p-2 hover:bg-white/10 rounded-full"
+              className="p-2 hover:bg-white/10 rounded-full text-indigo-400 hover:text-indigo-300"
               title="Add to playlist"
             >
               <Plus className="w-5 h-5" />
