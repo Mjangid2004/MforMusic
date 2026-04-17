@@ -4,12 +4,55 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import YouTube from "react-youtube";
 import { usePlayer } from "@/context/PlayerContext";
 
+function LocalAudioPlayer() {
+  const { state, dispatch } = usePlayer();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentSong = state.queue[state.currentIndex];
+  const isLocal = currentSong?.isLocal || currentSong?.localUrl;
+
+  useEffect(() => {
+    if (!audioRef.current || !currentSong || !isLocal) return;
+
+    if (state.isPlaying) {
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.pause();
+    }
+  }, [state.isPlaying, currentSong, isLocal]);
+
+  useEffect(() => {
+    if (!audioRef.current || !currentSong || !isLocal) return;
+    audioRef.current.volume = state.volume;
+  }, [state.volume, currentSong, isLocal]);
+
+  if (!isLocal || !currentSong?.localUrl) return null;
+
+  return (
+    <audio
+      ref={audioRef}
+      src={currentSong.localUrl}
+      onEnded={() => dispatch({ type: "NEXT_SONG" })}
+      onTimeUpdate={() => {
+        if (audioRef.current) {
+          dispatch({ type: "SET_CURRENT_TIME", payload: audioRef.current.currentTime });
+          dispatch({ type: "SET_DURATION", payload: audioRef.current.duration || 0 });
+        }
+      }}
+      autoPlay
+    />
+  );
+}
+
 export default function YouTubePlayer() {
   const { state, dispatch } = usePlayer();
   const playerRef = useRef<any>(null);
   const currentVideoId = useRef<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const currentSong = state.queue[state.currentIndex];
+  const isLocal = currentSong?.isLocal || currentSong?.localUrl;
+
+  if (isLocal) {
+    return <LocalAudioPlayer />;
 
   const handleReady = useCallback((event: any) => {
     try {
@@ -121,6 +164,10 @@ export default function YouTubePlayer() {
   };
 
   if (!currentSong) return null;
+
+  if (isLocal) {
+    return <LocalAudioPlayer />;
+  }
 
   return (
     <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
