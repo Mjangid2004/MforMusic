@@ -8,8 +8,18 @@ import VolumeControl from "@/components/VolumeControl";
 import YouTubePlayer from "@/components/YouTubePlayer";
 import { X, Music2, Heart, Plus, Play } from "lucide-react";
 
-const MOCK_LYRICS: { [key: string]: string } = {
-  default: "Searching for lyrics...",
+const getMockLyrics = (song: any) => {
+  return `♪ ♫ ♪
+
+🎵 ${song?.title || "Unknown Title"}
+🎤 ${song?.artist || "Unknown Artist"}
+
+♪ ♫ ♪
+
+Lyrics will appear here
+when available for this song.
+
+♪ ♫ ♪`;
 };
 
 export default function NowPlaying() {
@@ -107,7 +117,7 @@ export default function NowPlaying() {
                 <span className="font-semibold">Lyrics</span>
               </div>
               <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line font-mono">
-                {MOCK_LYRICS.default}
+                {getMockLyrics(currentSong)}
               </div>
             </div>
           </div>
@@ -130,17 +140,22 @@ export default function NowPlaying() {
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto">
-          <Controls />
+          <div className="flex items-center justify-center gap-4">
+            <button onClick={() => setShowPlaylistMenu(!showPlaylistMenu)} className="p-2 hover:bg-white/10 rounded-full text-yellow-400" title="Add to playlist">
+              <Plus className="w-6 h-6" />
+            </button>
+            <Controls />
+            <button onClick={() => setShowLyrics(true)} className="p-2 hover:bg-white/10 rounded-full text-blue-400" title="Lyrics">
+              <Music2 className="w-6 h-6" />
+            </button>
+          </div>
           <div className="w-full mt-2">
             <ProgressBar />
           </div>
         </div>
 
         <div className="w-64 flex items-center justify-end gap-2">
-          <div className="relative">
-            <button onClick={() => setShowPlaylistMenu(!showPlaylistMenu)} className="p-2 hover:bg-white/10 rounded-full text-indigo-400" title="Add to playlist">
-              <Plus className="w-5 h-5" />
-            </button>
+          <div className="relative" style={{display:'none'}}>
             {showPlaylistMenu && (
               <div className="absolute right-0 bottom-full mb-2 w-56 bg-neutral-900 rounded-lg shadow-xl border border-white/10 overflow-hidden z-[200]">
                 <div className="p-2 border-b border-white/10">
